@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1594664727375.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "3B63C719",
+    "lastKnownWriteTime" : 1594681563,
+    "last_content_update" : 1594681563984,
+    "path" : "~/Documents/Research/Malaria/flexfit/R/processSmp.R",
+    "project_path" : "R/processSmp.R",
+    "properties" : {
+        "cursorPosition" : "161,18",
+        "scrollLine" : "144"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

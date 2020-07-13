@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1594664650686.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "167D0FD9",
+    "lastKnownWriteTime" : 1594680988,
+    "last_content_update" : 1594680988967,
+    "path" : "~/Documents/Research/Malaria/flexfit/R/prep.R",
+    "project_path" : "R/prep.R",
+    "properties" : {
+        "cursorPosition" : "119,1",
+        "scrollLine" : "95"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

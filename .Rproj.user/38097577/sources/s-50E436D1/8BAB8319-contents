@@ -1,0 +1,107 @@
+devtools::install_github("EPPIcenter/lumfit")
+devtools::install_github("EPPIcenter/flexfit")
+#library(lumfit)
+library(flexfit)
+
+#------------------------------------------------------------------------------#
+#                                    Prep                                      #
+#------------------------------------------------------------------------------#
+
+fdir    <- "../stdCurves/data/lumxUgandaRaw/"    # slash at the end
+#fdir <- "~/Downloads/SofTest/"
+fnames  <- list.files(fdir)  
+plotdir <- "../stdCurves/plots/stdUganda2/"       # or full path
+#plotdir <- "~/Downloads/SofPlots/"
+
+dtype  <- "Median"                  # data type
+stdstr <- "std|stand"               # e.g. "PP2"; can be ""  
+bgstr  <- "blank|background"
+stddil <- NULL # 10*5^(0:7)         # need values if not in Sample variable
+smpdil <- 1000
+nwells <- NULL  # 96                # non-NULL: only for special cases w/NA's
+maxrm  <- 2  
+model <- "sigmoid"
+Alow             <- NULL            # set to "bg" or numeric value to fix Alow
+asym             <- TRUE
+trim.flat        <- TRUE
+interactive      <- FALSE
+monot.prompt     <- FALSE           
+rm.before        <- FALSE      
+rm.after         <- interactive     
+set.bounds       <- interactive     # set bounds manually if cannot be calculated
+overwrite.bounds <- FALSE           # manually overwrite calculated bounds
+stdcol <- c("aquamarine4", "aquamarine3")              # standard points, fit
+rugcol <- c("cadetblue", "darkorchid3", "firebrick3")  # rug for sample values
+
+# extract the names of antigens
+MFI <- read_data(paste(fdir, fnames[1], sep = ""), datatype) 
+antigens <- names(MFI)[3:(ncol(MFI) - 1)]
+
+#------------------------------------------------------------------------------#
+#                                   Process                                    #
+#------------------------------------------------------------------------------#  
+
+output.list <- list()
+fit.flags   <- matrix("", nrow = length(fnames), ncol = length(antigens), 
+                      dimnames = list(fnames, antigens))
+
+# optional: some common ylim for all the plates and antigens, will go into ...
+ylim <- 0
+for (i in 1:length(fnames)) {
+  MFI <- read_data(paste(fdir, fnames[i], sep = ""))
+  for (antigen in antigens) {
+    ctrl <- extractStd(MFI, stdstr, bgstr, stddil, smpdil, antigen, yvar)  
+    ylim <- range(ylim, ctrl$std[, yvar], ctrl$smp, na.rm = TRUE)
+  }
+}  # end optional
+
+#*** for one combination - check first, then do the loop
+antigen <- antigens[1]; i <- 1
+fname <- fnames[i]
+dprep <- prepLum(antigen, fname, fdir = fdir, dtype = dtype, 
+                 stdstr = stdstr, bgstr = bgstr, stddil = stddil, 
+                 smpdil = smpdil, nwells = nwells, dformat = "%m/%d/%Y")
+ptitle <- paste(antigen, gsub(".csv", "", fname)) 
+pname  <- paste(gsub(" ", "_", ptitle), ".pdf", sep = "")
+smp <- dprep$smp; std <- dprep$std; bg <- dprep$bg; ismp <- dprep$ismp
+res <- processSmp(dprep$smp, dprep$std, dprep$bg, fitlog = "xy", 
+                  ismp = dprep$ismp, plotdir = plotdir, pname = pname, 
+                  ptitle = ptitle, xvar = "Conc", yvar = "MFI", smpvar = "MFI", 
+                  dilvar = "Dilution", resvar = "Conc", model = model, 
+                  Alow = Alow, asym = asym, trim.flat = trim.flat, 
+                  interactive = interactive, monot.prompt = monot.prompt,
+                  rm.before = rm.before, rm.after = rm.after, maxrm = maxrm, 
+                  set.bounds = set.bounds, overwrite.bounds = overwrite.bounds,
+                  ifix = NULL, stdcol = stdcol, rugcol = rugcol)
+
+for (antigen in antigens) {  
+  for (i in 1:length(fnames)) { 
+    res <- processLum(antigen, fnames[i], fdir = fdir, plotdir = plotdir,
+                      xvar = xvar, yvar = yvar, model = model, Alow = Alow,
+                      asym = asym, trim.flat = trim.flat, 
+                      interactive = interactive, monot.prompt = monot.prompt,
+                      rm.before = rm.before, rm.after = rm.after, 
+                      maxrm = maxrm, set.bounds = set.bounds, 
+                      overwrite.bounds = overwrite.bounds, ifix = NULL, 
+                      dtype = datatype, stdstr = stdstr, bgstr = bgstr, 
+                      stddil = stddil, smpdil = smpdil, nwells = nwells,
+                      ptcol = ptcol, rugcols = rugcols)
+                      # dformat = "%m/%d/%Y", width = 7, height = 7  # for pdf()        
+    output.list[[paste(antigen, i, sep = "_")]] <- res$smps
+    fit.flags[i, antigen]                       <- res$fitflag
+    ntrimmed[ i, antigen]                       <- res$ntrimmed
+    # optional: save provisional results
+    save(output.list, fit.flags, file = "res.RData")  
+  }
+}
+
+output.data <- do.call(rbind, output.list)  
+fit.flags                                   # check the flags
+# save to .csv
+write.csv(output.data, file = "results.csv")          
+system("rm res.RData") 
+
+#*** manual bounds don't change colors of the samples - change!
+#    go to fitStd.R line 94 (maybe) OR for setting bounds only: 
+#    will require replotting however (when is it replotting now??)
+

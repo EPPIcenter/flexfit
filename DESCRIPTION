@@ -3,7 +3,7 @@ Type: Package
 Title: Flexible Format Standard Curve Fitting and Data Processing
 Version: 0.99.0
 Author: Who wrote it
-Maintainer: The package maintainer <inna.gerlovina@ucsf.net>
+Maintainer: The package maintainer <inna.gerlovina@ucsf.edu>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
 Depends: R (>= 3.5.0)
