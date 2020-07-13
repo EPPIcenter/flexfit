@@ -1,0 +1,416 @@
+\documentclass[12pt]{article}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{sidecap}
+\usepackage[font=small, labelfont=bf]{caption}
+\usepackage{enumerate}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage[makeroom]{cancel}
+
+\setlength{\parindent}{0cm}
+\newtheorem*{theorem}{Claim}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\addtolength{\oddsidemargin}{-.5in}%
+\addtolength{\textwidth}{1in}%
+
+\begin{document}
+
+\title{Starting parameters for lumfit} 
+\date{\vspace{-5ex}}
+\maketitle
+
+\section{Logistic function}
+
+Standards: log of concentration $x_{(1)}, \dotsc, x_{(n)}$ with
+corresponding log of summary (median, mean) MFI $y_{(1)}, \dotsc,
+y_{(n)}$. We want to fit a logistic function to these standards: 
+\begin{equation} \label{eq:logistic}
+ y(x) = A_0 + \frac{A}{\left(1 + e^{-\frac{x - x_0}{s}} \right)^a}
+\end{equation}
+
+\subsection{Lower asymptote $A_0$ unknown}
+
+First, we choose three points $(x_{1}, y_{1}), (x_{2}, y_{2}),
+(x_{3}, y_{3})$, e.g. $x_{1} = x_{(1)}, x_{2} = x_{(\left \lceil
+    n/2 \right \rceil)}, x_{3} = x_{(n)}$. Next, find parameters $A_0, A,
+s, x_0$, and $a$ such that the function passes through these points
+while minimizing some loss in regards to the remaining points
+(e.g. $\sum_{i = 1}^n (y_i - \hat{y}_i)^2$):
+
+\begin{align}
+  y_1 &= A_0 + \frac{A}{\left(1 + e^{-\frac{x_1 - x_0}{s}}
+            \right)^a} \notag \\
+  y_2 &= A_0 + \frac{A}{\left(1 + e^{-\frac{x_2 - x_0}{s}}
+            \right)^a} \notag \\
+  y_3 &= A_0 + \frac{A}{\left(1 + e^{-\frac{x_3 - x_0}{s}}
+            \right)^a} 
+\end{align}  
+Reparameterize the model to get bounds on some of the parameters: let
+$\bar{w} = e^{\frac{x_0}{s}}$ and $v = e^{-\frac{1}{s}}$. Then
+\begin{align} \label{eq:ybarw}
+  y_1 &= A_0 + \frac{A}{\left(1 + \bar{w} \, v^{x_1} \right)^a}
+            \notag \\
+  y_2 &= A_0 + \frac{A}{\left(1 + \bar{w} \, v^{x_2} \right)^a}
+  \notag \\
+  y_3 &= A_0 + \frac{A}{\left(1 + \bar{w} \, v^{x_3} \right)^a}.
+\end{align}
+Alternatively, we can set $w = e^{-\frac{x_1 - x_0}{x}}$ and keep
+$v = e^{-\frac{1}{s}}$. Then
+\begin{align} \label{eq:yw}
+  y_1 &= A_0 + \frac{A}{(1 + w)^a} \notag \\
+  y_2 &= A_0 + \frac{A}{\left(1 + w \, v^{x_2 - x_1}\right)^a}
+            \notag \\
+  y_3 &= A_0 + \frac{A}{\left(1 + w \, v^{x_3 - x_1}\right)^a}
+\end{align}
+
+To remove $A_0$:
+\begin{align}
+  y_2 - y_1 &= A \left[ \frac{1}{\left( 1 + \bar{w} \, v^{x_2}
+  \right)^a} - \frac{1}{\left( 1 + \bar{w} \, v^{x_1} \right)^a} \right]
+                      \notag \\
+  &= A \left[ \frac{1}{\left(1 + w \, v^{x_2 - x_1} \right)^a}
+    - \frac{1}{(1 + w)^a} \right] \notag \\
+  y_3 - y_1 &= A \left[ \frac{1}{\left(1 + w \, v^{x_3 - x_1} \right)^a}
+    - \frac{1}{(1 + w)^a} \right].  
+\end{align}
+Next step is to remove [get rid of] $A$. Let $b = \frac{y_3 -
+  y_1}{y_2 - y_1}$.
+\begin{align}
+  b &= \left[ \frac{1}{\big(1 + \bar{w} \, v^{x_3} \big)^a} -
+                 \frac{1}{\big(1 + \bar{w} \, v^{x_1} \big)^a}
+  \right] / 
+          \left[ \frac{1}{\big(1 + \bar{w} \, v^{x_2} \big)^a} -
+                   \frac{1}{\big(1 + \bar{w} \, v^{x_1} \big)^a}
+      \right] \notag \\
+    &= \left[ \frac{1}{\big(1 + w \, v^{x_3 - x_1} \big)^a} -
+                 \frac{1}{(1 + w)^a} \right] / 
+          \left[ \frac{1}{\big(1 + w \, v^{x_2 - x_1} \big)^a} -
+                   \frac{1}{(1 + w)^a} \right] 
+\end{align}
+
+Find $w$ and $v$ or $\bar{w}$ and $v$. \\
+
+We can write 
+\begin{equation} \label{eq:b}
+  b - \frac{\left[ \frac{1}{\big(1 + \bar{w} \, v^{x_3} \big)^a} -
+                 \frac{1}{\big(1 + \bar{w} \, v^{x_1} \big)^a}
+  \right]} 
+          {\left[ \frac{1}{\big(1 + \bar{w} \, v^{x_2} \big)^a} -
+                   \frac{1}{\big(1 + \bar{w} \, v^{x_1} \big)^a}
+      \right]}
+    = b - \frac{\left[ \frac{1}{\big(1 + w \, v^{x_3 - x_1} \big)^a} -
+                 \frac{1}{(1 + w)^a} \right]} 
+          {\left[ \frac{1}{\big(1 + w \, v^{x_2 - x_1} \big)^a} -
+                   \frac{1}{(1 + w)^a} \right]} = 0
+\end{equation}
+             
+Since the value of $b$ is known from the data (standards), we can
+assign various values to $v$ and calculate $w$ or $\bar{w}$ for each
+of these values so that they satisfy \eqref{eq:b} (the root of
+equation \eqref{eq:b} in regard to $w$ or $\bar{w}$). This can be
+found numerically - having pairs $(w, v)$ or $(\hat{w}, v)$, find $A$:
+\begin{equation}
+  A = \frac{y_3 - y_1}{\frac{1}{\big(1 + \bar{w} \, v^{x_3} \big)^a} -
+    \frac{1}{\big(1 + \bar{w} \, v^{x_1} \big)^a}}
+     = \frac{y_3 - y_1}{\frac{1}{\big(1 + w \, v^{x_3 - x_1} \big)^a} -
+                 \frac{1}{(1 + w)^a}},
+\end{equation}
+or similarly it can be done through $(y_2 - y_1) / (\dotsc)$. \\
+
+Then we can find $A_0$ through $y_1$ or $y_2$ or $y_3$, e.g.
+\begin{equation} \label{eq:A0}
+  A_0 = y_3 - \frac{A}{\left(1 + \bar{w} \, v^{x_3} \right)^a}
+        = y_3 - \frac{A}{\left(1 + w \, v^{x_3 - x_1} \right)^a}.
+\end{equation}
+
+For some situations, a special case when $a = 1$ (the curve is
+symmetric about a middle point) can be desired; for others, fitting
+asymmetry parameter $a$ can be beneficial. Still, subsequent
+optimization performs well in terms of fitting $a$ even when the
+starting value is $1$, so we set $a = 1$ for this stage. Then we can
+rewrite the difference 
+\begin{align}
+  y_2 - y_1 &= A \left[ \frac{1}{1 + \bar{w} \, v^{x_2}}
+                             - \frac{1}{1 + \bar{w} \, v^{x_1}} \right]
+              = A \, \frac{1 + \bar{w} \, v^{x_2}
+              - 1 - \bar{w} \, v^{x_2}}
+              {\big(1 + \bar{w} \, v^{x_2} \big) \,
+              \big(1 + \bar{w} \, v^{x_1} \big)} \notag \\[1em]
+            & = A \, \bar{w} \, \frac{v^{x_1} - v^{x_2}}
+              {\big(1 + \bar{w} \, v^{x_2} \big) \,
+              \big(1 + \bar{w} \, v^{x_1} \big)} \notag \\[1em]
+            & = A \, \bar{w} \, v^{x_1} \, \label{eq:dif1}
+              \frac{1 - v^{x_2 - x_1}}
+             {\big(1 + \bar{w} \, v^{x_2} \big) \,
+              \big(1 + \bar{w} \, v^{x_1} \big)} 
+             = A \, w \, \frac{1 - v^{x_2 - x_1}}
+              {(1 + w) \big(1 + w \, v^{x_2 - x_1}\big)} \\[1em]
+  y_3 - y_1 &= A \, \bar{w} \, v^{x_1} \, \label{eq:dif2}
+              \frac{1 - v^{x_3 - x_1}}
+             {\big(1 + \bar{w} \, v^{x_3} \big) \,
+              \big(1 + \bar{w} \, v^{x_1} \big)} 
+             = A \, \frac{w}{1 + w} \: \frac{1 - v^{x_3 - x_1}}
+              {1 + w \, v^{x_3 - x_1}}
+\end{align}
+By dividing \eqref{eq:dif2} by \eqref{eq:dif1}, we get
+\begin{equation}
+  b = \frac{\big(1 - v^{x_3 - x_1} \big)}
+    {\big( 1 + \bar{w} \, v^{x^3} \big)} \:
+    \frac{\big(1 + \bar{w} \, v^{x_2} \big)}
+           {\big(1 - v^{x_2 - x_1}\big)}
+      = \frac{\big(1 - v^{x_3 - x_1}\big) \,
+                 \big(1 + w \, v^{x_2 - x_1}\big)}
+               {\big(1 + w \, v^{x_3 - x_1}\big) \,
+                \big(1 - v^{x_2 - x_1}\big)}.   
+\end{equation}
+
+Let
+\begin{equation}
+  b_v = b \; \frac{1 - v^{x_2 - x_1}}{1 - v^{x_3 - x_1}}
+  = \frac{1 + \bar{w} \, v^{x_2}}{1 + \bar{w} \, v^{x_3}}
+  = \frac{1 + w \, v^{x_2 - x_1}}{1 + w \, v^{x_3 - x_1}}
+\end{equation}
+From that, we can get $w$ or $\bar{w}$ directly:
+\begin{flalign}
+  & b_v \, \big(1 + w, v^{x_3 - x_1} \big) = 1 + w \, v^{x_2 - x_1}
+                                          \notag \\
+  & b_v + b_v \, w \, v^{x_3 - x_1} = 1 + w \, v^{x_2 - x^1} \notag \\
+  & b_v - 1 = w \, v^{x_2 - x_1} - w \, b_v \, v^{x_3 - x_1} 
+             = w \, v^{x_2 -x_1} \, \big(1 - b_v \, v^{x_3 -
+               x_2}\big)
+             = \bar{w} \, v^{x_2} \, \big(1 - b_v \, v^{x_3 - x_2}
+             \big) \notag \\
+  & w = \frac{b_v - 1}{1 - b_v \, v^{x_3 - x_2}} \, v^{x_1 - x_2} \\
+  & \bar{w} = \frac{b_v - 1}{1 + b_v \, v^{x_3 - x_2}} \, v^{-x_2}
+                = \frac{b_v - 1}{v^{x_2} - b_v \, v^{x_3}}.
+\end{flalign}
+
+Further,
+\begin{equation}
+  A = (y_3 - y_1) \, \frac{1 + w}{w} \: \frac{1 + w \, v^{x_3 - x_1}}
+                                                             {1 - v^{x_3 - x_1}}
+     = (y_3 - y_1) \, \frac{1 + \bar{w} \, v^{x_1}}
+     {\bar{w} \, v^{x_1}} \:
+     \frac{1 + \bar{w} \, v^{x_3}}{1 - v^{x_3 - x_1}},
+\end{equation}
+followed by \eqref{eq:A0}.
+
+\subsection{Lower asymptote known}
+
+In this case, $A_0$ in \eqref{eq:logistic} is a known (given)
+value. Let
+\begin{equation}
+  y_0(x) = y(x) - A_0.
+\end{equation}
+Then instead of \eqref{eq:ybarw} and
+\eqref{eq:yw} we get:
+\begin{align}
+  y_{01} &= \frac{A}{\big(1 + \bar{w} \, v^{x_1} \big)^a} \notag \\
+  y_{02} &= \frac{A}{\big(1 + \bar{w} \, v^{x_2} \big)^a} \notag \\
+  y_{03} &= \frac{A}{\big(1 + \bar{w} \, v^{x_3} \big)^a} 
+\end{align}
+Or:
+\begin{align}
+  y_{01} &= \frac{A}{\big(1 + w\big)^a} \notag \\
+  y_{02} &= \frac{A}{\big(1 + w \, v^{x_2 - x_1} \big)^a} \notag \\
+  y_{03} &= \frac{A}{\big(1 + w \, v^{x_3 - x_1} \big)^a} 
+\end{align}
+Let
+\begin{alignat}{2} \label{eq:B}
+  &B_2 = \frac{y_{02}}{y_{01}}, && B_3 = \frac{y_{03}}{y_{01}}
+  \qquad \text{and} \\
+  &b_2 = B_2^{\frac{1}{a}} = \left( \frac{y_{02}}{y_{01}}
+  \right)^{\frac{1}{a}}, \; &&
+  b_3 = B_3^{\frac{1}{a}} = \left( \frac{y_{03}}{y_{01}}
+  \right)^{\frac{1}{a}}.
+\end{alignat}
+We can see that
+\begin{align} \label{eq:bw}
+  &b_2 = \frac{1 + w}{1 + w \, v^{x_2 - x_1}} \notag \\
+  &b_3 = \frac{1 + w}{1 + w \, v^{x_3 - x_1}} \text{, and therefore} \\
+  &b_2 + b_2 \, w \, v^{x_2 - x_1} = 1 + w \notag \\
+  &b_3 + b_3 \, w \, v^{x_3 - x_1} = 1 + w, 
+\end{align}
+from which we can easily find $w$ for given $v$ or find $v$ for given
+$w$.
+\begin{alignat}{2}
+  v &= \left(\frac{1 + w - b_2}{b_2 \, w}\right)^{\frac{1}{x_2 - x_1}}
+  && \text{ or }
+  v   = \left(\frac{1 + w - b_3}{b_3 \, w}\right)^{\frac{1}{x_3 - x_1}}
+  \\
+  w &= \frac{b_2 - 1}{1 - b_2 \, v^{x_2 - x_1}} && \text{ or }
+  w   = \frac{b_3 - 1}{1 - b_3 \, v^{x_3 - x_1}}  
+\end{alignat}
+\begin{align}
+  A &= y_{02} \, \big(1 + w \, v^{x_2 - x_1}\big)^a \text{ or} \notag \\
+  A &= y_{03} \, \big(1 + w \, v^{x_3 - x_1}\big)^a
+\end{align}
+Alternatively, we can use $\bar{w}$ instead of $w$. Now instead of
+\eqref{eq:bw} we get
+\begin{align}
+  &b_2 = \frac{1 + \bar{w} \, v^{x_1}}{1 + \bar{w} \, v^{x_2}} \notag
+  \\[1em]
+  &b_3 = \frac{1 + \bar{w} \, v^{x_1}}{1 + \bar{w} \, v^{x_3}} \text{,
+    and therefore} \\[1em]
+  &b_2 + b_2 \, \bar{w} \, v^{x_2} = 1 + \bar{w} \, v^{x_1} \notag \\
+  &b_3 + b_3 \, \bar{w} \, v^{x_3} = 1 + \bar{w} \, v^{x_1}.
+\end{align}
+In this case, finding $v$ is not as convenient but finding $\bar{w}$
+is:
+\begin{equation} \label{eq:barw}
+  \bar{w} = \frac{b_2 - 1}{v^{x_1} - b_2 \, v^{x_2}} \text{ or }
+  \bar{w} = \frac{b_3 - 1}{v^{x_1} - b_3 \, v^{x_3}} \text{, and consequently }  
+\end{equation}
+\begin{align}
+  A &= y_{02} \, \big(1 + \bar{w} \, v^{x_3}\big)^a \notag \\
+  A &= y_{03} \, \big(1 + \bar{w} \, v^{x_2}\big)^a. 
+\end{align}
+Note that these expressions yield different values of $A$ {\color{blue}
+  (???)}. \\
+
+Now, make the function pass through the designated three points. \\
+Using \eqref{eq:barw}, we can write
+\begin{equation*}
+  \frac{b_2 - 1}{\cancel{v^{x_1}} \, \big(1 - b_2 \, v^{x_2 - x_1}\big)} =
+  \frac{b_3 - 1}{\cancel{v^{x_1}} \, \big(1 - b_3 \, v^{x_3 - x_1}\big)} 
+\end{equation*}
+Let $V \equiv v^{x_2 - x_1}$ and $m \equiv \frac{x_3 - x_1}{x_2 -
+  x_1}$. Then
+\begin{equation}
+  \frac{b_2 - 1}{1 - b_2 \, V} = \frac{b_3 - 1}{1 - b_3 \,
+V^m}, \text{ and thus}
+\end{equation}
+\begin{align}
+  &1 - b_3 \, V^m = \frac{b_3 - 1}{b_2 - 1} \: (1 - b_2 \,
+    V)  \\[0.5em] 
+  &b_3 \, V^m - b_2 \frac{b_3 - 1}{b_2 - 1} \, V +
+    \left(\frac{b_3 - 1}{b_2 - 1} - 1\right) = 0 \notag \\[0.5em]
+  &V^m - \frac{b_2}{b_3} \: \frac{b_3 - 1}{b_2 - 1} \, V +
+    \frac{1}{b_3} \: \frac{b_3 - b_2}{b_2 - 1} = 0. \label{eq:vm}
+\end{align}
+For $m \neq 2$, equation \eqref{eq:vm} could be solved numerically,
+but for $m = 2$, there is a nice solution:
+\begin{align} \label{eq:V2}
+  &V^2 - \frac{b_2}{b_3} \: \frac{b_3 - 1}{b_2 - 1} \, V +
+    \frac{b_3 - b_2}{b_3(b_2 - 1)} = 0 \text{ can be
+    written as} \\ 
+  &(V - 1)\left(V - \frac{b_3 - b_2}{b_3(b_2 - 1)} \right) = 0. 
+\end{align}
+Solution $V = 1$ is not relevant since for every $x$, $1^x =
+1$. Therefore the only applicable solution is 
+\begin{equation}
+  V = \frac{b_3 - b_2}{b_3(b_2 - 1)}.
+\end{equation}
+Then
+\begin{alignat}{2}
+  v &= V^{\frac{1}{x_2 - x_1}} \notag && \\
+    w &= \frac{b_2 - 1}{1 - b_2 \, V} &&\text{ or }
+    w   = \frac{b_3 - 1}{1 - b_3 \, V^m} \notag \\[0.5em]
+    A &= y_{02} \, (1 + w \, V)^a               &&\text{ or }
+    A   = y_{03} \, \big(1 + w \, V^m\big)^a. 
+\end{alignat}
+
+\textbf{Remark}: \\
+
+If we multiply equation \eqref{eq:V2} by $b_3 \, (b_2 - 1)$, we
+get 
+\begin{equation} \label{eq:c}
+  b_3 \, (b_2 - 1) \, V^2 - b_2 \, (b_3 - 1) \, V + b_3 - b_2 = 0.
+\end{equation}
+When $V = 1$, the equation \eqref{eq:c} is true for any $b_2$ and
+$b_3$ and thus $1$ is one of the solutions of the equation
+\eqref{eq:V2}.  
+\iffalse
+\begin{equation}
+ \cancel{b_3 \, b_2} - \cancel{b_3} - \cancel{b_2 \, b_3} +
+ \bcancel{b_2} + \cancel{b_3} - \bcancel{b_2} = 0. 
+\end{equation}
+Thus, $1$ is the solution of the equation \eqref{eq:V2}. \\
+\fi
+For the other solution, note that if $x_1$ and $x_2$ are the roots of the
+equation $x^2 - bx + c = 0$, then $(x - x_1)(x - x_2) = 0$ or $x^2 -
+(x_1 + x_2)x + x_1 x_2 = 0$ and therefore $b = x_1 + x_2$ and $c = x_1
+x_2$. If $x_1 = 1$, it is immediately follows that $x_2 = c$. \\
+
+
+{\large {\color{blue} *** WITH ALTERNATIVE NOTATION: } } \\
+
+Changing notation to match the source code: $c_{21} \equiv b_2$, $c_{31}
+\equiv b_3$,
+\begin{equation}
+  \frac{c_{21} - 1}{1 - c_{21} \, v^{x_2 - x_1}} =
+  \frac{c_{31} - 1}{1 - c_{31} \, v^{x_3 - x_1}}.
+\end{equation}
+Let $V \equiv v^{x_2 - x_1}$ and $m \equiv \frac{x_3 - x_1}{x_2 -
+  x_1}$. Then
+\begin{equation}
+  \frac{c_{21} - 1}{1 - c_{21} \, V} = \frac{c_{31} - 1}{1 - c_{31} \,
+V^m}, \text{ and thus}
+\end{equation}
+\begin{align}
+  &1 - c_{31} \, V^m = \frac{c_{31} - 1}{c_{21} - 1} \: (1 - c_{21} \,
+    V)  \\[0.5em] 
+  &c_{31} \, V^m - c_{21} \frac{c_{31} - 1}{c_{21} - 1} \, V +
+    \left(\frac{c_{31} - 1}{c_{21} - 1} - 1\right) = 0 \notag \\[0.5em]
+  &V^m - \frac{c_{21}}{c_{31}} \: \frac{c_{31} - 1}{c_{21} - 1} \, V +
+    \frac{1}{c_{31}} \: \frac{c_{31} - c_{21}}{c_{21} - 1} = 0. \label{eq:vm}
+\end{align}
+For $m \neq 2$, equation \eqref{eq:vm} could be solved numerically,
+but for $m = 2$, there is a nice solution:
+\begin{align} \label{eq:V2}
+  &V^2 - \frac{c_{21}}{c_{31}} \: \frac{c_{31} - 1}{c_{21} - 1} \, V +
+    \frac{c_{31} - c_{21}}{c_{31}(c_{21} - 1)} = 0 \text{ can be
+    written as} \\ 
+  &(V - 1)\left(V - \frac{c_{31} - c_{21}}{c_{31}(c_{21} - 1)} \right)
+    = 0.
+\end{align}
+Solution $V = 1$ is not relevant since for every $x$, $1^x =
+1$. Therefore the only applicable solution is 
+\begin{equation}
+  V = \frac{c_{31} - c_{21}}{c_{31}(c_{21} - 1)}.
+\end{equation}
+Then
+\begin{alignat}{2}
+  v &= V^{\frac{1}{x_2 - x_1}} \notag && \\
+    w &= \frac{c_{21} - 1}{1 - c_{21} \, V} &&\text{ or }
+    w   = \frac{c_{31} - 1}{1 - c_{31} \, V^m} \notag \\[0.5em]
+    A &= y_{02} \, (1 + w \, V)^a               &&\text{ or }
+    A   = y_{03} \, \big(1 + w \, V^m\big)^a. 
+\end{alignat}
+
+\textbf{Remark}: \\
+
+If we multiply equation \eqref{eq:V2} by $c_{31} \, (c_{21} - 1)$, we
+get 
+\begin{equation} \label{eq:c}
+  c_{31} \, (c_{21} - 1) \, V^2 - c_{21} \, (c_{31} - 1) \, V + c_{31}
+  - c_{21} = 0.
+\end{equation}
+When $V = 1$, the equation \eqref{eq:c} is true for any $c_{21}$ and
+$c_{31}$ and thus $1$ is one of the solutions of the equation
+\eqref{eq:V2}.  
+\iffalse
+\begin{equation}
+ \cancel{c_{31} \, c_{21}} - \cancel{c_{31}} - \cancel{c_{21} \,
+   c_{31}} + \bcancel{c_{21}} + \cancel{c_{31}} - \bcancel{c_{21}} = 0.
+\end{equation}
+Thus, $1$ is the solution of the equation \eqref{eq:V2}. \\
+\fi
+For the other solution, note that if $x_1$ and $x_2$ are the roots of the
+equation $x^2 - bx + c = 0$, then $(x - x_1)(x - x_2) = 0$ or $x^2 -
+(x_1 + x_2)x + x_1 x_2 = 0$ and therefore $b = x_1 + x_2$ and $c = x_1
+x_2$. If $x_1 = 1$, it is immediately follows that $x_2 = c$.    
+
+
+\end{document}

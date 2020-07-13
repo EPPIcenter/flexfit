@@ -1,0 +1,585 @@
+setwd("~/Documents/Research/Edgeworth/edgee")
+setwd("~/Documents/Projects/edgee")
+setwd("~/Documents/Projects/Umoments")
+library(roxygen2)
+library(devtools)
+library(Umoments)
+library(edgee)
+library(limma)
+
+#load_all()
+document()
+build()
+install()
+load_all()
+use_testthat()
+test()
+check()
+build_win()  # check for Windows (both R-release and R-devel)
+
+library(BiocCheck)
+BiocCheck("~/Documents/Research/Edgeworth/edgee")
+BiocCheck("~/Documents/Projects/edgee")
+BiocCheck("~/Documents/Projects/Umoments")
+
+# R CMD check --as-cran Umoments_0.1.1.tar.gz
+# devtools::use_build_ignore("README.md")
+# devtools::check_win_*()
+# knitr::Sweave2knitr("vignetteUmom.Rnw")
+
+#---------------------- timing of generating combinations ---------------------#
+
+t5 <- readRDS("/Users/innars/Documents/Research/Edgeworth/Combinations/terms5.rds")
+(t5$time2 - t5$time1)/t5$time1
+#------------------------------------------------------------------------------#
+
+library(RColorBrewer)
+treg.col <- brewer.pal(9, "Oranges")[8:4]
+tmod.col <- brewer.pal(9, "Greens")[8:4]
+ordstr <- paste(c("1st", "2nd", "3rd", "4th", "5th"), "order")
+legendstr <- paste(rep(ordstr, 2), c("Ordinary t-statistic", rep("", 4),
+                                     "Moderated t-statistic", rep("", 4)))
+
+
+# for 2smp compare biased and unbiased (also for others),
+# create a few nice plots
+# OK to do both JOSS and JSS?
+
+#use_package("limma", "Suggests")
+#' @useDynLib edgee, .registration=TRUE
+# do not use registration in namespace because it interferes with
+#            registring in init-edgee.c
+
+#----------------- functions for  simulation -----------------#
+
+simRandDist <- function(M, n) {
+  dist <- sample(0:1, size = M, replace = TRUE)
+  dat <- matrix(NA, nrow = M, ncol = n)
+  for (i in 1:M) {
+    if (dist[i]) {
+      shp <- runif(1, 1, 50)
+      dat[i, ] <- rgamma(n, shape = shp) - shp
+    } else {
+      varlog <- runif(1, 0.01, 1)
+      dat[i, ] <- rlnorm(n, sdlog = sqrt(varlog)) - exp(varlog/2)
+    }
+  }
+  return(dat)
+}
+
+glcsmp.fn <- function(x, n, umin, umax) { # glc boot., sample size n, x - matrix
+  ndat <- ncol(x)
+  xboot <- matrix(NA, nrow(x), n)
+  for (i in 1:n) {
+    pair <- x[, sample(1:ndat, size = 2, replace = TRUE)]
+    z <- runif(1, umin, umax)
+    xnew <- z * pair[, 1] + (1-z) * pair[, 2]
+    xboot[, i] <- xnew
+  }
+  return(xboot)
+}
+
+glc1.fn <- function(x, n, umin, umax) {  # one-dim (user for one row at a time)
+  ndat <- length(x)
+  xboot <- numeric(length = n)
+  for (i in 1:n) {
+    pair <- x[sample(1:ndat, size = 2, replace = TRUE)]
+    z <- runif(1, umin, umax)
+    xboot[i] <- z*pair[1] + (1 - z)*pair[2]
+  }
+  return(xboot)
+}
+
+#====================================================================#
+#--------------------------------------------------------------------#
+#                        one-smp simulation                          #
+#--------------------------------------------------------------------#
+#====================================================================#
+
+n <- 10
+M <- 1e+5
+alpha <- 0.05
+shp <- 3
+varlog <- 0.4
+pnn <- 0.05  # proportion of non-nulls
+NN <- M*(1 - pnn)                # number non-significant
+NS <- M*pnn                      # number significant
+#dat <- simRandDist(M, n)
+dat <- matrix(rgamma(M*n, shape = shp) - shp, nrow = M, ncol = n)
+#dat <- matrix(rlnorm(M*n, sdlog = sqrt(varlog)) - exp(varlog/2), nrow = M, ncol = n)
+shifts <- runif(NS, 1, 5)
+dat[1:NS, ] <- dat[1:NS, ] - shifts
+
+side <- "left"
+side <- "right"
+side <- "two-sided"
+# use main function
+system.time(res1 <- empEdge(dat, side = side, unbiased.mom = TRUE))
+system.time(res2 <- empEdge(dat, side = side, unbiased.mom = FALSE))
+head(res1)
+head(res2)
+
+# prep for R functions
+n <- ncol(dat)
+m <- nrow(dat)
+design.mat <- rep(1, n)
+fit <- lmFit(dat, design.mat, weights = NULL)
+nf <- sum(1/n[n != 0])             # one-smp: 1/n, two-smp: 1/nx + 1/ny
+t.ord <- fit$coefficients[, ncol(fit$coefficients)]/(sqrt(nf)*fit$sigma)
+fbay <- eBayes(fit)
+s20 <- fbay$s2.prior
+d0  <- fbay$df.prior
+t.mod <- as.double(fbay$t[, ncol(fbay$t)])
+varpost <- as.double(fbay$s2.post)
+
+# compare with not high-dimensional
+i <- 4
+empEdge(dat[i, ], side = side)
+res1[i, 1:5]
+empEdge(dat[i, ], unbiased.mom = FALSE, side = side)
+res2[i, 1:5]
+
+# *** #
+# compare with R functions (one row at a time)
+stats1 <- smpStats(dat[i, ])
+stats2 <- smpStats(dat[i, ], unbiased.mom = FALSE)
+stats1M <- smpStats(dat[i, ], moder = TRUE,
+                    d0 = d0, s20 = s20, varpost = varpost[i])
+stats2M <- smpStats(dat[i, ], unbiased.mom = FALSE, moder = TRUE,
+                    d0 = d0, s20 = s20, varpost = varpost[i])
+# tail diagnostic
+res1[i, ]
+tailDiag(stats1, n)
+tailDiag(stats1M, n, type = "one-sample", moder = TRUE)
+res2[i, ]
+tailDiag(stats2, n)
+tailDiag(stats2M, n, type = "one-sample", moder = TRUE)
+# compare C and R results
+Ft <- makeFx(stats1M, n, type = "one-sample", base = "t", moder = TRUE)
+Ft(t.mod[i])*2
+res1[i, 6:10]
+Ft <- makeFx(stats1, n, type = "short", base = "t", moder = FALSE)
+Ft(t.ord[i])*2
+res1[i, 1:5]
+Ft <- makeFx(stats2M, n, type = "one-sample", base = "t", moder = TRUE)
+Ft(t.mod[i])*2
+res2[i, 6:10]
+Ft <- makeFx(stats2, n, type = "short", base = "t", moder = FALSE)
+Ft(t.ord[i])*2
+res2[i, 1:5]
+
+system.time(res3 <- empEdge(dat, side = side, unbiased.mom = TRUE))
+system.time(res4 <- empEdge(dat, side = side, unbiased.mom = FALSE))
+
+###### d0 = Inf ######
+M <- 1e4
+dat <- matrix(rnorm(M*n), nrow = M, ncol = n)
+shifts <- runif(NS, 1, 5)
+dat[1:NS, ] <- dat[1:NS, ] - shifts
+side <- "two-sided"
+# use main function
+system.time(res1 <- empEdge(dat, side = side, unbiased.mom = TRUE))
+system.time(res2 <- empEdge(dat, side = side, unbiased.mom = FALSE))
+head(res1)
+head(res2)
+i <- 3
+# go up to # *** #
+
+# to compare timing of lmFit and ebayes
+n <- ncol(dat)
+m <- nrow(dat)
+design.mat <- rep(1, n)
+system.time(fit <- lmFit(dat, design.mat, weights = NULL))
+system.time(fbay <- ebayes(fit))
+system.time(res <- empEdge(dat, unbiased.mom = TRUE))
+
+#--------------------------------------------------------------------#
+#                             PLOTTING                               #
+#--------------------------------------------------------------------#
+
+source("~/Documents/Research/Edgeworth/functionsEdge.R")
+rm(empEdge)
+
+res1 <- empEdge(dat, side = side, unbiased.mom = TRUE)#, side = "left")
+res2 <- empEdge(dat, side = side, unbiased.mom = FALSE)
+stats1 <- processFDR(res1, NS, NN)
+stats2 <- processFDR(res2, NS, NN)
+ylim <- c(0, 1)
+xlim <- c(0., 0.2)
+
+main <- bquote(atop("High-dimensional simulation, Log-normal" ~ (sigma^2 == 0.4) ~ "",
+                    "two-sided test"))
+main <- bquote(atop("High-dimensional convex simulation, n = 9, two-sided test"))
+
+filename <- "~/Documents/Research/Edgeworth/plotsSubst/BiasUnb1/gam3.pdf"
+main2 <- bquote(atop("Gamma distribution (shape = 3)," ~ n == 10 ~ "," ~ m == 10^5 ~ "",
+                     "two-sided test, BIASED moment estimates (3 - 6)"))
+main1 <- bquote(atop("Gamma distribution (shape = 3)," ~ n == 10 ~ "," ~ m == 10^5 ~ "",
+                     "two-sided test, UNBIASED moment estimates (3 - 6)"))
+
+filename <- "~/Documents/Research/Edgeworth/plotsSubst/BiasUnb1/rand.pdf"
+main2 <- bquote(atop("Randomly selected distributions," ~ n == 10 ~ "," ~ m == 10^5 ~ "",
+                     "one-sided test, BIASED higher moment estimates"))
+main1 <- bquote(atop("Randomly selected distributions," ~ n == 10 ~ "," ~ m == 10^5 ~ "",
+                     "one-sided test, UNBIASED higher moment estimates"))
+
+filename <- "~/Documents/Research/Edgeworth/plotsSubst/BiasUnb1/conv3.pdf"
+main2 <- bquote(atop("Convex pseudo-data simulation," ~ n == 10 ~ "," ~ m == 10^5 ~ "",
+                     "two-sided test, BIASED higher moment estimates"))
+main1 <- bquote(atop("Convex pseudo-data simulation," ~ n == 10 ~ "," ~ m == 10^5 ~ "",
+                     "two-sided test, UNBIASED higher moment estimates"))
+
+filename <- "~/Documents/Research/Edgeworth/plotsSubst/BiasUnb2/conv3.pdf"
+main2 <- bquote(atop("Convex pseudo-data simulation," ~ n[0] == 10 ~ "," ~
+                      n[1] == 8 ~ "," ~ m == 24354 ~ "",
+                    "two-sided test, BIASED moment estimates"))
+main1 <- bquote(atop("Convex pseudo-data simulation," ~ n[0] == 10 ~ "," ~
+                      n[1] == 8 ~ "," ~ m == 24354 ~ "",
+                    "two-sided test, UNBIASED moment estimates"))
+
+filename <- "~/Documents/Research/Edgeworth/plotsSubst/BiasUnb2/gam3norm.pdf"
+main2 <- bquote(atop("Normal and gamma distributions," ~ n[0] == 10 ~ ","  ~
+                       n[1] == 8 ~ "," ~ m == 10^5 ~ "",
+                     "two-sided test, BIASED moment estimates (3 - 6)"))
+main1 <- bquote(atop("Normal and gamma distributions," ~ n[0] == 10 ~ "," ~
+                       n[1] == 8 ~ "," ~ m == 10^5 ~ "",
+                     "two-sided test, UNBIASED moment estimates (3 - 6)"))
+
+pl <- "bottomright"
+pl <- "topleft"
+pl <- "top"
+pdf(file = filename, width = 15, height = 6.5)
+#postscript(file = gsub(".pdf", ".eps", filename), width = 9,
+#           height = 9 * 6/13,  # family = "serif")
+#           horizontal = FALSE, paper = "special") #, onefile = FALSE
+par(mfrow = c(1, 2))
+# plot for biased
+par(mar = c(4, 4, 4, 0) + 0.1)
+plot(stats2["fdr", ], stats2["power", ], pch = 16, cex = 2,
+     col = c(treg.col[1:5], tmod.col[1:5]), ylim = ylim, xlim = xlim,
+     main = main2, xlab = "FDR", ylab = "Power")
+legend(pl, bty = "n", fill = c(treg.col, tmod.col), legend = legendstr)
+# plot for unbiased
+par(mar = c(4, 3, 4, 1) + 0.1)
+plot(stats1["fdr", ], stats1["power", ], pch = 16, cex = 2,
+     col = c(treg.col[1:5], tmod.col[1:5]), ylim = ylim, xlim = xlim,
+     main = main1, xlab = "FDR", ylab = "Power")
+legend(pl, bty = "n", fill = c(treg.col, tmod.col), legend = legendstr)
+dev.off()
+
+# for demonstration
+fname <- gsub("BiasUnb2", "present", filename)
+fname <- paste(gsub(".pdf", "", fname), "twosmp", ".pdf", sep = "")
+main <- bquote(atop("Normal and gamma distributions," ~ n[0] == 10 ~ "," ~
+                      n[1] == 8 ~ "," ~ m == 10^5 ~ "",
+                    "two-sided test, unbiased moment estimates"))
+pdf(file = fname, width = 8, height = 6.5)
+#postscript(file = gsub(".pdf", ".eps", fname), width = 7,
+#          height = 7 * 5/6)#,  # family = "serif")
+#           horizontal = FALSE, paper = "special") #, onefile = FALSE
+par(mar = c(4, 4, 4, 1) + 0.1)
+plot(stats1["fdr", ], stats1["power", ], pch = 16, cex = 2,
+     col = c(treg.col[1:5], tmod.col[1:5]), ylim = ylim, xlim = xlim,
+     main = main, xlab = "FDR", ylab = "Power")
+legend(pl, bty = "n", fill = c(treg.col, tmod.col), legend = legendstr)
+dev.off()
+
+
+
+#====================================================================#
+#--------------------------------------------------------------------#
+#                        two-smp simulation                          #
+#--------------------------------------------------------------------#
+#====================================================================#
+
+#----------- regular simulation -----------#
+M <- 1e+5
+pnn <- 0.05  # proportion of non-nulls
+NN <- M*(1 - pnn)                # number non-significant
+NS <- M*pnn                      # number significant
+nx <- 8
+ny <- 10
+shp <- 3
+#dat <- simRandDist(M, n)
+dat <- matrix(rgamma(M*nx, shape = shp) - shp, nrow = M, ncol = nx)  # treatment
+#dat <- matrix(rlnorm(M*n, sdlog = sqrt(varlog)) - exp(varlog/2), nrow = M, ncol = n)
+shifts <- runif(NS, 1, 5)
+#shifts <- rnorm(NS, mean = 3, sd = 1)  # sd = 2?
+dat[1:NS, ] <- dat[1:NS, ] - shifts  # - for "left", + for "right"
+dat <- cbind(matrix(rnorm(ny*M, sd = sqrt(shp)), nrow = M), dat)
+a <- rep(0:1, c(ny, nx))
+
+#------------ convex simulation -----------#
+#------------------------------------------#
+
+# dim = c(24354, 51); a = bin.age, NS = # signif (1433), NN = M - NS, signif - first rows
+load("~/Documents/Research/Edgeworth/ageData.RData")  # dat, bin.age, true.sign
+bin.age <- as.logical(bin.age)
+indsign <- which(true.sign)
+indnonsign <- which(!true.sign)
+M <- nrow(dat)
+NS <- sum(true.sign)
+NN <- M - NS
+mean0 <- apply(dat[, !bin.age], 1, mean)
+mean1 <- apply(dat[, bin.age], 1, mean)
+## Non-significant: center by group - separate means
+dat[indnonsign, !bin.age] <- dat[indnonsign, !bin.age] - mean0[indnonsign]
+dat[indnonsign, bin.age]  <- dat[indnonsign, bin.age]  - mean1[indnonsign]
+## Significant: subtract mean0 from all # (for two-smp) center together - one global mean
+dat[indsign, ] <- dat[indsign, ] - mean0[indsign]
+dat <- rbind(dat[indsign, ], dat[indnonsign, ])  # rearrange rows (signif first)
+rownames(dat) <- NULL
+colnames(dat) <- NULL
+dat.orig <- dat
+Ma <- M; NSa <- NS; NNa <- NN  # for original age data
+
+#---- quick, same # of rows, 1smp
+dat <- glcsmp.fn(dat.orig[, bin.age], n, 0, 1)
+#---- quick, same # of rows, 2smp
+dat <- cbind(glcsmp.fn(dat.orig[,  bin.age], nx, 0, 1),
+             glcsmp.fn(dat.orig[, !bin.age], ny, 0, 1))
+a <- rep(1:0, c(nx, ny))
+
+#---- dimensions provided
+M <- 1e+5
+pnn <- 0.05  # proportion of non-nulls
+NN <- M*(1 - pnn)                # number non-significant
+NS <- M*pnn                      # number significant
+nx <- 8
+ny <- 10
+
+dat <- matrix(NA, nrow = M, ncol <- nx + ny)
+ind <- c(sample(1:NSa, size = NS, replace = TRUE),
+         sample((NSa + 1):Ma, size = NN, replace = TRUE))
+for (i in 1:M) {
+  smpx <- glc1.fn(dat.orig[ind[i], bin.age], nx, 0, 1)
+  smpy <- glc1.fn(dat.orig[ind[i], !bin.age], ny, 0, 1)
+  dat[i, ] <- c(smpx, smpy)
+}
+a <- rep(1:0, c(nx, ny))
+#save(dat, file = "../testdat.RData")
+#load(file = "~/Documents/Research/Edgeworth/testdat.RData")
+
+#---------------------------------------------------------------------------#
+
+side <- "left"
+side <- "right"
+side <- "two-sided"
+# use main function
+system.time(res1 <- empEdge(dat, a, side = side, unbiased.mom = TRUE))
+system.time(res2 <- empEdge(dat, a, side = side, unbiased.mom = FALSE))
+head(res1)
+head(res2)
+
+# prep for R functions
+m <- nrow(dat)
+design.mat <- model.matrix(~ a)
+fit <- lmFit(dat, design.mat, weights = NULL)
+nf <- 1/nx + 1/ny
+t.ord <- fit$coefficients[, ncol(fit$coefficients)]/(sqrt(nf)*fit$sigma)
+fbay <- eBayes(fit)
+s20 <- fbay$s2.prior
+d0  <- fbay$df.prior
+t.mod <- as.double(fbay$t[, ncol(fbay$t)])
+varpost <- as.double(fbay$s2.post)
+
+# compare with not high-dimensional
+i <- 1
+empEdge(dat[i, ], a, side = side)
+res1[i, 1:5]
+empEdge(dat[i, ], a, side = side, unbiased.mom = FALSE)
+res2[i, 1:5]
+
+# *** #
+# compare with R functions (one row at a time)
+stats1 <- smpStats(dat[i, ], a)
+stats2 <- smpStats(dat[i, ], a, unbiased.mom = FALSE)
+stats1M <- smpStats(dat[i, ], a, moder = TRUE,
+                    d0 = d0, s20 = s20, varpost = varpost[i])
+stats2M <- smpStats(dat[i, ], a, unbiased.mom = FALSE, moder = TRUE,
+                    d0 = d0, s20 = s20, varpost = varpost[i])
+n <- (nx + ny)/2
+# tail diagnostic
+res1[i, ]
+tailDiag(stats1, n, type = "two-sample")
+tailDiag(stats1M, n, type = "two-sample", moder = TRUE)
+res2[i, ]
+tailDiag(stats2, n, type = "two-sample")
+tailDiag(stats2M, n, type = "two-sample", moder = TRUE)
+# compare C and R results
+Ft <- makeFx(stats1M, n, type = "two-sample", base = "t", moder = TRUE)
+Ft(t.mod[i])*2
+res1[i, 6:10]
+Ft <- makeFx(stats1, n, type = "two-sample", base = "t", moder = FALSE)
+Ft(t.ord[i])*2
+res1[i, 1:5]
+Ft <- makeFx(stats2M, n, type = "two-sample", base = "t", moder = TRUE)
+Ft(t.mod[i])*2
+res2[i, 6:10]
+Ft <- makeFx(stats2, n, type = "two-sample", base = "t", moder = FALSE)
+Ft(t.ord[i])*2
+res2[i, 1:5]
+
+###### d0 = Inf ######
+M <- 1e3
+dat <- matrix(rnorm(M*(nx + ny)), nrow = M)
+side <- "two-sided"
+# use main function
+system.time(res1 <- empEdge(dat, a, side = side, unbiased.mom = TRUE))
+system.time(res2 <- empEdge(dat, a, side = side, unbiased.mom = FALSE))
+head(res1)
+head(res2)
+i <- 3
+# go up to # *** #
+
+#--------------------------------------------------------------------#
+#                            Welch t-test                            #
+#--------------------------------------------------------------------#
+
+# simulation: go up to two-smp simulation (use the same data)
+# Running and comparisons
+
+load(file = "~/Documents/Research/Edgeworth/testdat.RData")
+side <- "left"
+side <- "right"
+side <- "two-sided"
+# use main function
+system.time(res1 <- empEdge(dat, a, side = side, type = "Welch",  unbiased.mom = TRUE))
+system.time(res2 <- empEdge(dat, a, side = side, type = "Welch",  unbiased.mom = FALSE))
+head(res1)
+head(res2)
+
+# prep for R functions
+datx <- dat[, a == max(a)]
+daty <- dat[, a != max(a)]
+t.ord <- (rowMeans(datx) - rowMeans(daty)) /
+  (sqrt(apply(datx, 1, var)/nx + apply(daty, 1, var)/ny))
+
+# compare with not high-dimensional
+i <- 2
+empEdge(dat[i, ], a, side = side, type = "Welch", unbiased.mom = TRUE)
+res1[i, ]
+empEdge(dat[i, ], a, side = side, type = "Welch", unbiased.mom = FALSE)
+res2[i, ]
+
+# *** #
+# compare with R functions (one row at a time)
+stats1 <- smpStats(dat[i, ], a, type = "Welch")
+stats2 <- smpStats(dat[i, ], a, type = "Welch", unbiased.mom = FALSE)
+n <- (nx + ny)/2
+# tail diagnostic
+res1[i, ]
+tailDiag(stats1, n, type = "two-sample")
+res2[i, ]
+tailDiag(stats2, n, type = "two-sample")
+# compare C and R results
+Ft <- makeFx(stats1, n, type = "two-sample", base = "t", moder = FALSE)
+Ft(t.ord[i])*2
+(1 - Ft(t.ord[i]))*2
+res1[i, ]
+Ft <- makeFx(stats2, n, type = "two-sample", base = "t", moder = FALSE)
+Ft(t.ord[i])*2
+(1 - Ft(t.ord[i]))*2
+res2[i, ]
+
+#--------------------------------------------------------------------#
+#--------------------------------------------------------------------#
+
+# to compare timing of lmFit and ebayes
+n <- ncol(dat)
+m <- nrow(dat)
+design.mat <- rep(1, n)
+system.time(fit <- lmFit(dat, design.mat, weights = NULL))
+system.time(fbay <- ebayes(fit))
+system.time(res <- empEdge(dat, unbiased.mom = TRUE))
+
+
+system.time(res <- empEdge(dat, a))
+system.time(res <- empEdge(dat, a, unbiased.mom = TRUE))
+system.time(res <- empEdge(dat, a, type = "Welch"))
+treat <- a == max(a)
+n <- c(sum(treat), sum(!treat))
+dat <- cbind(dat[, treat], dat[, !treat])
+design.mat <- model.matrix(~ rep(1:0, n))
+system.time(fit <- lmFit(dat, design.mat, weights = NULL))
+system.time(fbay <- eBayes(fit))
+
+# check t.ord
+daty <- dat[, 1:ny]
+datx <- dat[, (ny + 1):(nx + ny)]
+mx <- rowMeans(datx); my <- rowMeans(daty)
+vx <- apply(datx, 1, var); vy <- apply(daty, 1, var)
+v <- ((nx - 1)*vx + (ny - 1)*vy)/(nx + ny - 2)
+t1 <- (my - mx)/sqrt(v)*2
+t2 <- fit$coefficients[, 2]/(sqrt(sum(1/n))*fit$sigma)
+
+#---------------- parallel -------------------#
+
+library(doParallel)
+nthreads <- parallel::detectCores(logical = FALSE) - 1  # threads, not cores
+cl       <- parallel::makeCluster(nthreads)
+registerDoParallel(cl)
+#cuts <- ceiling(M/ncores)
+breaks <- ceiling(seq(1, M, length.out = nthreads + 1))[-(nthreads + 1)]
+cuts <- cbind(breaks, c((breaks - 1)[-1], M))
+
+#-------------------- checking two-sample moment estimates --------------------#
+
+library(Umoments)
+uM4(28, 67, 13)
+uM4pool(28, 67, 13, 13)
+uM5(28, 67, 169, 13)
+uM5pool(28, 67, 169, 13, 13)
+uM6(12, 28, 67, 169, 13)
+uM6pool(12, 28, 67, 169, 13, 13)
+
+# gamma distribution simulation
+shp <- 5
+mu2 <- shp
+mu3 <- 2*shp
+mu4 <- 3*shp^2 + 6*shp
+mu5 <- 20*shp^2 + 24*shp
+mu6 <- 15*shp^3 + 130*shp^2 + 120*shp
+
+nx <- 10; ny <- 15; S <- 1e5
+M <- matrix(NA, nrow = S, ncol = 10,
+            dimnames = list(NULL, c("M2", "M3", "M4", "M2pow2", "M5", "M2M3",
+                                    "M6", "M2pow3", "M3pow2", "M2M4")))
+mm <- matrix(NA, nrow = S, ncol = 6,
+             dimnames = list(NULL, paste("m", 1:6, sep = "")))
+for (i in 1:S) {
+  smpx <- rgamma(nx, shape = shp) - shp*2
+  smpy <- rgamma(ny, shape = shp)
+  mx <- mean(smpx)
+  my <- mean(smpy)
+  m  <- numeric(6)
+  for (j in 2:6) {
+    m[j] <- mean(c((smpx - mx)^j, (smpy - my)^j))
+  }
+  M[i, "M2"]     <- uM2pool(m[2], nx, ny)
+  M[i, "M3"]     <- uM3pool(m[3], nx, ny)
+  M[i, "M4"]     <- uM4pool(    m[2], m[4], nx, ny)
+  M[i, "M2pow2"] <- uM2pow2pool(m[2], m[4], nx, ny)
+  M[i, "M5"]     <- uM5pool(    m[2], m[3], m[5], nx, ny)
+  M[i, "M2M3"]   <- uM2M3pool(  m[2], m[3], m[5], nx, ny)
+  M[i, "M6"]     <- uM6pool(    m[2], m[3], m[4], m[6], nx, ny)
+  M[i, "M2pow3"] <- uM2pow3pool(m[2], m[3], m[4], m[6], nx, ny)
+  M[i, "M3pow2"] <- uM3pow2pool(m[2], m[3], m[4], m[6], nx, ny)
+  M[i, "M2M4"]   <- uM2M4pool(  m[2], m[3], m[4], m[6], nx, ny)
+  mm[i, ] <- m
+}
+
+res <- rbind(true = c(mu2, mu3, mu4, mu2^2, mu5, mu2*mu3, mu6, mu2^3, mu3^2,
+                      mu2*mu4),
+             unbsd = colMeans(M),
+             biased = c(mean(mm[, "m2"]), mean(mm[, "m3"]), mean(mm[, "m4"]),
+                        mean(mm[, "m2"]^2), mean(mm[, "m5"]),
+                        mean(mm[, "m2"]*mm[, "m3"]), mean(mm[, "m6"]),
+                        mean(mm[, "m2"]^3), mean(mm[, "m3"]^2),
+                        mean(mm[, "m2"]*mm[, "m4"])))
+colnames(res) <- colnames(M)
+res
+abs(res[2:3, ] - rbind(res[1, ], res[1, ]))
+abs(res[2:3, ] - rbind(res[1, ], res[1, ])) / rbind(res[1, ], res[1, ])
+
+
