@@ -165,27 +165,27 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
     FUNinv <- flinInv
   }
 
-  smps <- normalizeSmp(smp, smpvar, resvar, dilvar, FUNinv, finfit$par,
+  out <- normalizeSmp(smp, smpvar, resvar, dilvar, FUNinv, finfit$par,
                        finfit$bounds, finfit$flag, fitlog, trim.flat)
 
   fplot <- paste(plotdir, pname, ".pdf", sep = "")
   pdf(file = fplot, width = width, height = height)
   if (!is.null(finfit$par)) {
-    trimval <- smps[1, c("trim_lo", "trim_up")]
-    trimext <- (trimval == smps[1, c("min", "max")]) + 1  # at extrema
+    trimval <- out[1, c("trim_lo", "trim_up")]
+    trimext <- (trimval == out[1, c("min", "max")]) + 1  # at extrema
     plotFit(std, xvar, yvar, dilvar, finfit$par, FUNmod, finfit$iout, bg,
-            smp[, smpvar], smp[, "Flag"], trimval, trimext, rugcol, stdcol,
+            out[, smpvar], out[, "Flag"], trimval, trimext, rugcol, stdcol,
             main = ptitle, xlab = xlab, ylab = ylab, ...)
   } else {
     plotFit(std, xvar, yvar, dilvar, iout = finfit$out, bg = bg,
-            smp = smp[, smpvar], rugcol = rugcol, stdcol = stdcol,
+            vsmp = out[, smpvar], rugcol = rugcol, stdcol = stdcol,
             main = ptitle, xlab = xlab, ylab = ylab, ...)
   }
   dev.off()
   options(warn = 0)
-  #  return(list(smps = smps, fitflag = finfit$flag))  #*** if not below
+  #  return(list(smp = out, fitflag = finfit$flag))  #*** if not below
   #***================ optional: number of trimmed samples =================***#
-  return(list(smp = smp, fitflag = finfit$flag, ntrim = sum(smp$trimmed)))
+  return(list(smp = out, fitflag = finfit$flag, ntrim = sum(out$trimmed)))
 }
 
 

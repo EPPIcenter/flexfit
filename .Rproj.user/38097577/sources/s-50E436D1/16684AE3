@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1594683145499.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2275006715",
+    "id" : "16684AE3",
+    "lastKnownWriteTime" : 1594689542,
+    "last_content_update" : 1594689542572,
+    "path" : "~/Documents/Research/Malaria/flexfit/R/plotFit.R",
+    "project_path" : "R/plotFit.R",
+    "properties" : {
+        "cursorPosition" : "19,0",
+        "scrollLine" : "13"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

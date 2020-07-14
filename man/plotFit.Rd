@@ -5,7 +5,7 @@
 \title{Plot the fit for standards and the samples}
 \usage{
 plotFit(std, xvar, yvar, dilvar, fitpar = NULL, FUNmod = NULL,
-  iout = NULL, bg = NULL, smp = NULL, smpflag = NULL,
+  iout = NULL, bg = NULL, vsmp = NULL, smpflag = NULL,
   trimval = NULL, trimext = NULL, rugcol = c("cadetblue",
   "darkorchid3", "firebrick3"), stdcol = c("aquamarine4", "aquamarine3"),
   ...)
@@ -30,7 +30,7 @@ curve.}
 
 \item{bg}{background values.}
 
-\item{smp}{sample values.}
+\item{vsmp}{sample values.}
 
 \item{smpflag}{character vector, flags for each sample.}
 

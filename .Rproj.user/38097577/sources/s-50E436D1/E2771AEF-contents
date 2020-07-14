@@ -8,6 +8,7 @@
 #'
 #' @param dilvar character string to check if there is a dilution variable in
 #'   \code{std}. If found, used for x-axis labels only.
+#' @param vsmp    sample values.
 #' @param info   information about a particular run for warning messages.
 #' @inheritParams processSmp
 #'
@@ -23,7 +24,7 @@ fitStd <- function(std, xvar, yvar, dilvar,
                    interactive = TRUE, monot.prompt = FALSE,
                    rm.before = FALSE, rm.after = interactive, maxrm = 2,
                    set.bounds = FALSE, overwrite.bounds = FALSE, bg = NULL,
-                   smp = NULL, optmethod = "Nelder-Mead", maxit = 5e3,
+                   vsmp = NULL, optmethod = "Nelder-Mead", maxit = 5e3,
                    info = "", ifix = NULL, rugcol, ...) {
   if (!is.null(Alow) && Alow == "bg") Alow <- mean(log(bg))  #*** or log(mean(bg))
   flag <- ""
@@ -44,7 +45,7 @@ fitStd <- function(std, xvar, yvar, dilvar,
   }
 
   if (rm.before) {
-    plotFit(std, xvar, yvar, dilvar, bg = bg, smp = smp, ...)
+    plotFit(std, xvar, yvar, dilvar, bg = bg, vsmp = vsmp, ...)
     for (i in 1:maxrm) {
       ans1 <- readline("Remove any outliers? (y/n) ")
       if (tolower(ans1) == "y"){
@@ -113,15 +114,15 @@ fitStd <- function(std, xvar, yvar, dilvar,
     fitpar  <- fit.orig         # restore original fit and iout
     iout    <- iout.orig
     #*** INSERTED - is it a useful functionality?
-    smpflag <- rep("", length(smp))
+    smpflag <- rep("", length(vsmp))
     mindet <- max(min(std1[, yvar]), fitpar["Alow"])
     maxdet <- min(max(std1[, yvar]), fitpar["Aup"])
-    smpflag[!(mindet <= smp & smp <= maxdet)] <- "min"
+    smpflag[!(mindet <= vsmp & vsmp <= maxdet)] <- "min"
     plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod, bg = bg,
-            smp = smp, smpflag = smpflag, ...)
+            vsmp = vsmp, smpflag = smpflag, ...)
     #*** end INSERTED, uncomment plotFit() below
 #    plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod, bg = bg,
-#            smp = smp, ...)
+#            vsmp = vsmp, ...)
 
     for (i in 1:maxrm) {
       ans1 <- readline("Remove any outliers? (y/n) ")
@@ -154,15 +155,15 @@ fitStd <- function(std, xvar, yvar, dilvar,
         }
         fitpar <- addParam(fit$par, Alow, asym)
         #*** INSERTED - is it a useful functionality?
-        smpflag <- rep("", length(smp))
+        smpflag <- rep("", length(vsmp))
         mindet <- max(min(std1[, yvar]), fitpar["Alow"])
         maxdet <- min(max(std1[, yvar]), fitpar["Aup"])
-        smpflag[!(mindet <= smp & smp <= maxdet)] <- "min"
+        smpflag[!(mindet <= vsmp & vsmp <= maxdet)] <- "min"
         plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod,
-                bg = bg, smp = smp, smpflag = smpflag, ...)
+                bg = bg, vsmp = vsmp, smpflag = smpflag, ...)
         #*** end INSERTED, uncomment plotFit() below
 #        plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod,
-#                iout = iout, bg = bg, smp = smp, ...)
+#                iout = iout, bg = bg, vsmp = vsmp, ...)
       } else {         # answer no
         if (i == 1) {  # answer no for the first time
           revise <- FALSE
@@ -221,15 +222,15 @@ fitStd <- function(std, xvar, yvar, dilvar,
         if (!rm.after) {  # no active current plot
           #*** INSERTED - is it a useful functionality?
           #***** The problem: what if there IS current plot - add purple to rug???
-          smpflag <- rep("", length(smp))
+          smpflag <- rep("", length(vsmp))
           mindet <- max(min(std1[, yvar]), fitpar["Alow"])
           maxdet <- min(max(std1[, yvar]), fitpar["Aup"])
-          smpflag[!(mindet <= smp & smp <= maxdet)] <- "min"
+          smpflag[!(mindet <= vsmp & vsmp <= maxdet)] <- "min"
           plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod,
-                  bg = bg, smp = smp, smpflag = smpflag, ...)
+                  bg = bg, vsmp = vsmp, smpflag = smpflag, ...)
           #*** end INSERTED, uncomment plotFit() below
 #          plotFit(std, xvar, yvar, dilvar, fitpar = fit$par, FUNmod = FUNmod,
-#                  iout = iout, bg = bg, smp = smp, ...)
+#                  iout = iout, bg = bg, vsmp = vsmp, ...)
           abline(h = bounds[c("lowerbound", "upperbound")], col = rugcol[2],
                  lty = 4)
           legend("right", bty = "n", cex = 0.9, col = rugcol[2], lty = 4,
@@ -240,7 +241,7 @@ fitStd <- function(std, xvar, yvar, dilvar,
         mtext("Indicate lower bound with a click", col = "red", cex = 1.2)
         bounds["lowerbound"] <- locator(n = 1)$y
         plotFit(std, xvar, yvar, dilvar, fitpar = fit$par, FUNmod = FUNmod,
-                iout = iout, bg = bg, smp = smp, ...)
+                iout = iout, bg = bg, vsmp = vsmp, ...)
         abline(h = bounds[c("lowerbound", "upperbound")], col = rugcol[2],
                lty = 4)
         legend("right", bty = "n", cex = 0.9, col = rugcol[2], lty = 4,
@@ -259,7 +260,7 @@ fitStd <- function(std, xvar, yvar, dilvar,
         flag <- paste(flag, ", ub_manual", sep = "")
         if (!(rm.after || overlower || overwrite.bounds)) {  # no active plot
           plotFit(std, xvar, yvar, dilvar, fitpar = fit$par, FUNmod = FUNmod,
-                  iout = iout, bg = bg, smp = smp, ...)
+                  iout = iout, bg = bg, vsmp = vsmp, ...)
           abline(h = bounds[c("lowerbound", "upperbound")], col = rugcol[2],
                  lty = 4)
           legend("right", bty = "n", cex = 0.9, col = rugcol[2], lty = 4,
@@ -270,7 +271,7 @@ fitStd <- function(std, xvar, yvar, dilvar,
         mtext("Indicate upper bound with a click", col = "red", cex = 1.2)
         bounds["upperbound"] <- locator(n = 1)$y
         plotFit(std, xvar, yvar, dilvar, fitpar = fit$par, FUNmod = FUNmod,
-                iout = iout, bg = bg, smp = smp, ...)
+                iout = iout, bg = bg, vsmp = vsmp, ...)
         abline(h = bounds[c("lowerbound", "upperbound")], col = rugcol[2],
                lty = 4)
         legend("right", bty = "n", cex = 0.9, col = rugcol[3:2], lty = 4,

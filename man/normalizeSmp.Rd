@@ -12,9 +12,9 @@ normalizeSmp(smp, smpvar, resvar, dilvar, FUNinv, par, bounds, fitflag,
 
 \item{smpvar}{character string indicating sample variable.}
 
-\item{resvar}{character strings for dilution variable and results}
+\item{resvar}{character strings for dilution variable and results.}
 
-\item{dilvar}{character strings for dilution variable and results}
+\item{dilvar}{character strings for dilution variable and results.}
 
 \item{FUNinv}{inverse function to infer sample concentration}
 

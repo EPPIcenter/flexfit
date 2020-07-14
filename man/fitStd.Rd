@@ -8,7 +8,7 @@ fitStd(std, xvar, yvar, dilvar, model = "sigmoid", Alow = NULL,
   asym = TRUE, interactive = TRUE, monot.prompt = FALSE,
   rm.before = FALSE, rm.after = interactive, maxrm = 2,
   set.bounds = FALSE, overwrite.bounds = FALSE, bg = NULL,
-  smp = NULL, optmethod = "Nelder-Mead", maxit = 5000, info = "",
+  vsmp = NULL, optmethod = "Nelder-Mead", maxit = 5000, info = "",
   ifix = NULL, rugcol, ...)
 }
 \arguments{
@@ -64,8 +64,7 @@ automatically set bounds. Ignored if \code{interactive} is \code{FALSE}.}
 
 \item{bg}{values for background spots.}
 
-\item{smp}{data frame with sample ID, sample values and other optional
-variables (e.g. dilution).}
+\item{vsmp}{sample values.}
 
 \item{optmethod}{method to be used in optimization.}
 

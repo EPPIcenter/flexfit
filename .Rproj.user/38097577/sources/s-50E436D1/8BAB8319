@@ -5,15 +5,15 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "0",
+    "hash" : "3739724816",
     "id" : "8BAB8319",
-    "lastKnownWriteTime" : 1594681248,
-    "last_content_update" : 1594681248205,
+    "lastKnownWriteTime" : 1594683912,
+    "last_content_update" : 1594683912415,
     "path" : "~/Documents/Research/Malaria/stdCurves/R/flexfitExample.R",
     "project_path" : null,
     "properties" : {
-        "cursorPosition" : "76,0",
-        "scrollLine" : "72"
+        "cursorPosition" : "91,23",
+        "scrollLine" : "57"
     },
     "read_only" : false,
     "read_only_alternatives" : [

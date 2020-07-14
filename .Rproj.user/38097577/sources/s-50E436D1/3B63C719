@@ -5,15 +5,15 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "0",
+    "hash" : "1060275036",
     "id" : "3B63C719",
-    "lastKnownWriteTime" : 1594681563,
-    "last_content_update" : 1594681563984,
+    "lastKnownWriteTime" : 1594689901,
+    "last_content_update" : 1594689901037,
     "path" : "~/Documents/Research/Malaria/flexfit/R/processSmp.R",
     "project_path" : "R/processSmp.R",
     "properties" : {
-        "cursorPosition" : "161,18",
-        "scrollLine" : "144"
+        "cursorPosition" : "180,13",
+        "scrollLine" : "157"
     },
     "read_only" : false,
     "read_only_alternatives" : [

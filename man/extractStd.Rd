@@ -21,7 +21,8 @@ column. Not case sensitive.}
 \code{NULL}, all the dilutions indicated in a "Sample" variable are used.}
 
 \item{smpdil}{single value for sample dilutions (if dilutions are not
-provided in \code{smp} data frame).}
+provided in \code{smp} data frame). Ignored if \code{dilvar} is provided
+and the variable is included in \code{smp} data frame.}
 
 \item{antigen}{character string.}
 

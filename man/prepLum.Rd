@@ -31,7 +31,8 @@ inferred from the file's "Sample" column. Non-null value can be used to
 exclude some dilutions from model fitting.}
 
 \item{smpdil}{single value for sample dilutions (if dilutions are not
-provided in \code{smp} data frame).}
+provided in \code{smp} data frame). Ignored if \code{dilvar} is provided
+and the variable is included in \code{smp} data frame.}
 
 \item{nwells}{number of wells. If \code{NULL}, inferred from the file.}
 

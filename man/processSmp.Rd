@@ -12,9 +12,9 @@ processSmp(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
   interactive = TRUE, monot.prompt = FALSE, rm.before = FALSE,
   rm.after = interactive, maxrm = 2, set.bounds = interactive,
   overwrite.bounds = FALSE, ifix = NULL, optmethod = "Nelder-Mead",
-  maxit = 5000, rugcol = c("cadetblue", "darkorchid3", "firebrick3"),
-  stdcol = c("aquamarine4", "aquamarine3"), width = 7, height = 6,
-  ...)
+  maxit = 5000, stdcol = c("aquamarine4", "aquamarine3"),
+  rugcol = c("cadetblue", "darkorchid3", "firebrick3"), width = 7,
+  height = 6, ...)
 }
 \arguments{
 \item{smp}{data frame with sample ID, sample values and other optional
@@ -25,7 +25,8 @@ variables (e.g. dilution).}
 \item{bg}{values for background spots.}
 
 \item{smpdil}{single value for sample dilutions (if dilutions are not
-provided in \code{smp} data frame).}
+provided in \code{smp} data frame). Ignored if \code{dilvar} is provided
+and the variable is included in \code{smp} data frame.}
 
 \item{fitlog}{character string indicating if standard values should be
 log-transformed for fitting. If the string contains _x_, \code{xvar} will
@@ -49,7 +50,7 @@ curve.}
 \item{addvar}{named vector for additional variables (e.g. date or plate),
 where element names will be used as variable names in \code{smp}.}
 
-\item{dilvar, resvar}{character strings for dilution variable and results}
+\item{dilvar, resvar}{character strings for dilution variable and results.}
 
 \item{model}{the model to be fit.}
 
@@ -104,12 +105,12 @@ used for getting starting values for optimization.}
 
 \item{maxit}{maximum number of iterations in optimization.}
 
+\item{stdcol}{vector of two colors for the standard points and the fit on the
+plot.}
+
 \item{rugcol}{vector of three colors for the rugplot, which indicates sample
 values (inside the bounds, between the bounds and extrema, and beyond
 extrema).}
-
-\item{stdcol}{vector of two colors for the standard points and the fit on the
-plot.}
 
 \item{width, height}{optional parameters for the final saved plot.}
 
