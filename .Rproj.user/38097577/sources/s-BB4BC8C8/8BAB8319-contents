@@ -30,11 +30,11 @@ rm.before        <- FALSE
 rm.after         <- interactive     
 set.bounds       <- interactive     # set bounds manually if cannot be calculated
 overwrite.bounds <- FALSE           # manually overwrite calculated bounds
-stdcol <- c("aquamarine4", "aquamarine3")              # standard points, fit
-rugcol <- c("cadetblue", "darkorchid3", "firebrick3")  # rug for sample values
+stdcol <- c("firebrick3", "darkslategray")        # standard points, fit
+rugcol <- c("cadetblue", "purple", "firebrick2")  # rug for sample values
 
 # extract the names of antigens
-MFI <- read_data(paste(fdir, fnames[1], sep = ""), datatype) 
+MFI <- read_data(paste(fdir, fnames[1], sep = ""), dtype) 
 antigens <- names(MFI)[3:(ncol(MFI) - 1)]
 
 #------------------------------------------------------------------------------#
@@ -46,23 +46,24 @@ fit.flags   <- matrix("", nrow = length(fnames), ncol = length(antigens),
                       dimnames = list(fnames, antigens))
 
 # optional: some common ylim for all the plates and antigens, will go into ...
+yvar <- "MFI"
 ylim <- 0
 for (i in 1:length(fnames)) {
   MFI <- read_data(paste(fdir, fnames[i], sep = ""))
   for (antigen in antigens) {
-    ctrl <- extractStd(MFI, stdstr, bgstr, stddil, smpdil, antigen, yvar)  
+    ctrl <- extractStd(MFI, stdstr, bgstr, stddil, smpdil, antigen, yvar, "")  
     ylim <- range(ylim, ctrl$std[, yvar], ctrl$smp, na.rm = TRUE)
   }
 }  # end optional
 
 #*** for one combination - check first, then do the loop
-antigen <- antigens[5]; i <- 2
+antigen <- antigens[19]; i <- 4
 fname <- fnames[i]
 dprep <- prepLum(antigen, fname, fdir = fdir, dtype = dtype, 
                  stdstr = stdstr, bgstr = bgstr, stddil = stddil, 
                  smpdil = smpdil, nwells = nwells, dformat = "%m/%d/%Y")
 ptitle <- paste(antigen, gsub(".csv", "", fname)) 
-pname  <- paste(gsub(" ", "_", ptitle), ".pdf", sep = "")
+pname  <- gsub(" ", "_", ptitle)
 smp <- dprep$smp; std <- dprep$std; bg <- dprep$bg; ismp <- dprep$ismp
 addvar <- NULL; smpvar <- "MFI"
 res <- processSmp(dprep$smp, dprep$std, dprep$bg, fitlog = "xy", 

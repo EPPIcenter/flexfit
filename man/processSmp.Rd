@@ -12,8 +12,8 @@ processSmp(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
   interactive = TRUE, monot.prompt = FALSE, rm.before = FALSE,
   rm.after = interactive, maxrm = 2, set.bounds = interactive,
   overwrite.bounds = FALSE, ifix = NULL, optmethod = "Nelder-Mead",
-  maxit = 5000, stdcol = c("aquamarine4", "aquamarine3"),
-  rugcol = c("cadetblue", "darkorchid3", "firebrick3"), width = 7,
+  maxit = 5000, stdcol = c("firebrick3", "darkslategray"),
+  rugcol = c("cadetblue", "purple", "firebrick2"), width = 7,
   height = 6, ...)
 }
 \arguments{
@@ -121,8 +121,8 @@ A list of length three. The first element is a data frame that
   contains the results; the second is a character string with a flag
   containing information about removed points, failure to fit the model,
   manually set bounds, and/or an optional custom note provided by the user
-  during an interactive model-fitting procedure. ***optional return of the
-  number of trimmed samples (then a list of length three)***
+  during an interactive model-fitting procedure. The last element is the
+  number of sample values for which the results are trimmed.
 }
 \description{
 Process data for a single antigen: fit a standard curve, establish bounds,

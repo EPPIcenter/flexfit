@@ -25,7 +25,7 @@ fitStd <- function(std, xvar, yvar, dilvar,
                    rm.before = FALSE, rm.after = interactive, maxrm = 2,
                    set.bounds = FALSE, overwrite.bounds = FALSE, bg = NULL,
                    vsmp = NULL, optmethod = "Nelder-Mead", maxit = 5e3,
-                   info = "", ifix = NULL, rugcol, ...) {
+                   info = "", ifix = NULL, stdcol, rugcol, ...) {
   if (!is.null(Alow) && Alow == "bg") Alow <- mean(log(bg))  #*** or log(mean(bg))
   flag <- ""
   iout <- NULL
@@ -45,7 +45,8 @@ fitStd <- function(std, xvar, yvar, dilvar,
   }
 
   if (rm.before) {
-    plotFit(std, xvar, yvar, dilvar, bg = bg, vsmp = vsmp, ...)
+    plotFit(std, xvar, yvar, dilvar, bg = bg, vsmp = vsmp,
+            stdcol = stdcol, rugcol = rugcol, ...)
     for (i in 1:maxrm) {
       ans1 <- readline("Remove any outliers? (y/n) ")
       if (tolower(ans1) == "y"){
@@ -119,10 +120,11 @@ fitStd <- function(std, xvar, yvar, dilvar,
     maxdet <- min(max(std1[, yvar]), fitpar["Aup"])
     smpflag[!(mindet <= vsmp & vsmp <= maxdet)] <- "min"
     plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod, bg = bg,
-            vsmp = vsmp, smpflag = smpflag, ...)
+            vsmp = vsmp, smpflag = smpflag, stdcol = stdcol, rugcol = rugcol,
+            ...)
     #*** end INSERTED, uncomment plotFit() below
 #    plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod, bg = bg,
-#            vsmp = vsmp, ...)
+#            vsmp = vsmp, stdcol = stdcol, rugcol = rugcol, ...)
 
     for (i in 1:maxrm) {
       ans1 <- readline("Remove any outliers? (y/n) ")
@@ -160,10 +162,12 @@ fitStd <- function(std, xvar, yvar, dilvar,
         maxdet <- min(max(std1[, yvar]), fitpar["Aup"])
         smpflag[!(mindet <= vsmp & vsmp <= maxdet)] <- "min"
         plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod,
-                bg = bg, vsmp = vsmp, smpflag = smpflag, ...)
+                bg = bg, vsmp = vsmp, smpflag = smpflag,
+                stdcol = stdcol, rugcol = rugcol, ...)
         #*** end INSERTED, uncomment plotFit() below
 #        plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod,
-#                iout = iout, bg = bg, vsmp = vsmp, ...)
+#                iout = iout, bg = bg, vsmp = vsmp,
+#                stdcol = stdcol, rugcol = rugcol,...)
       } else {         # answer no
         if (i == 1) {  # answer no for the first time
           revise <- FALSE
@@ -227,10 +231,12 @@ fitStd <- function(std, xvar, yvar, dilvar,
           maxdet <- min(max(std1[, yvar]), fitpar["Aup"])
           smpflag[!(mindet <= vsmp & vsmp <= maxdet)] <- "min"
           plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod,
-                  bg = bg, vsmp = vsmp, smpflag = smpflag, ...)
+                  bg = bg, vsmp = vsmp, smpflag = smpflag,
+                  stdcol = stdcol, rugcol = rugcol, ...)
           #*** end INSERTED, uncomment plotFit() below
 #          plotFit(std, xvar, yvar, dilvar, fitpar = fit$par, FUNmod = FUNmod,
-#                  iout = iout, bg = bg, vsmp = vsmp, ...)
+#                  iout = iout, bg = bg, vsmp = vsmp,
+#                  stdcol = stdcol, rugcol = rugcol, ...)
           abline(h = bounds[c("lowerbound", "upperbound")], col = rugcol[2],
                  lty = 4)
           legend("right", bty = "n", cex = 0.9, col = rugcol[2], lty = 4,
@@ -241,7 +247,8 @@ fitStd <- function(std, xvar, yvar, dilvar,
         mtext("Indicate lower bound with a click", col = "red", cex = 1.2)
         bounds["lowerbound"] <- locator(n = 1)$y
         plotFit(std, xvar, yvar, dilvar, fitpar = fit$par, FUNmod = FUNmod,
-                iout = iout, bg = bg, vsmp = vsmp, ...)
+                iout = iout, bg = bg, vsmp = vsmp,
+                stdcol = stdcol, rugcol = rugcol, ...)
         abline(h = bounds[c("lowerbound", "upperbound")], col = rugcol[2],
                lty = 4)
         legend("right", bty = "n", cex = 0.9, col = rugcol[2], lty = 4,
@@ -260,7 +267,8 @@ fitStd <- function(std, xvar, yvar, dilvar,
         flag <- paste(flag, ", ub_manual", sep = "")
         if (!(rm.after || overlower || overwrite.bounds)) {  # no active plot
           plotFit(std, xvar, yvar, dilvar, fitpar = fit$par, FUNmod = FUNmod,
-                  iout = iout, bg = bg, vsmp = vsmp, ...)
+                  iout = iout, bg = bg, vsmp = vsmp,
+                  stdcol = stdcol, rugcol = rugcol, ...)
           abline(h = bounds[c("lowerbound", "upperbound")], col = rugcol[2],
                  lty = 4)
           legend("right", bty = "n", cex = 0.9, col = rugcol[2], lty = 4,
@@ -271,7 +279,8 @@ fitStd <- function(std, xvar, yvar, dilvar,
         mtext("Indicate upper bound with a click", col = "red", cex = 1.2)
         bounds["upperbound"] <- locator(n = 1)$y
         plotFit(std, xvar, yvar, dilvar, fitpar = fit$par, FUNmod = FUNmod,
-                iout = iout, bg = bg, vsmp = vsmp, ...)
+                iout = iout, bg = bg, vsmp = vsmp,
+                stdcol = stdcol, rugcol = rugcol, ...)
         abline(h = bounds[c("lowerbound", "upperbound")], col = rugcol[2],
                lty = 4)
         legend("right", bty = "n", cex = 0.9, col = rugcol[3:2], lty = 4,

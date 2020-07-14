@@ -82,8 +82,8 @@
 #'   contains the results; the second is a character string with a flag
 #'   containing information about removed points, failure to fit the model,
 #'   manually set bounds, and/or an optional custom note provided by the user
-#'   during an interactive model-fitting procedure. ***optional return of the
-#'   number of trimmed samples (then a list of length three)***
+#'   during an interactive model-fitting procedure. The last element is the
+#'   number of sample values for which the results are trimmed.
 #'
 #' @examples
 #'
@@ -95,8 +95,6 @@
 #'
 #' @export
 
-# "coral3", "chartreuse3", "aquamarine3", "mediumvioletred", "olivedrab4" and 3
-# "seagreen4" and 3, "springreen4" and 3, "darkslategray4" and "" (!)
 processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
                        ismp = 1:nrow(smp),
                        plotdir = "./", pname = NULL, ptitle = "fit and samples",
@@ -109,8 +107,8 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
                        set.bounds = interactive, overwrite.bounds = FALSE,
                        ifix = NULL, optmethod = "Nelder-Mead", maxit = 5e3,
                        # nv3 = 10, nv4 = 100, # then include in fitStd() as well
-                       stdcol = c("aquamarine4", "aquamarine3"),
-                       rugcol = c("cadetblue", "darkorchid3", "firebrick3"),
+                       stdcol = c("firebrick3", "darkslategray"),
+                       rugcol = c("cadetblue", "purple", "firebrick2"),
                        width = 7, height = 6, ...) {
   options(warn = 1)    # for interactivity
   if (inherits(smp, "matrix")) {
@@ -155,7 +153,7 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
   finfit <- fitStd(std, xvar, yvar, dilvar, model, Alow, asym, interactive,
                    monot.prompt, rm.before, rm.after, maxrm, set.bounds,
                    overwrite.bounds, bg, smp[ismp, smpvar], optmethod, maxit,
-                   info = ptitle, ifix = ifix, rugcol = rugcol, stdcol = stdcol,
+                   info = ptitle, ifix = ifix, stdcol = stdcol, rugcol = rugcol,
                    main = ptitle, xlab = xlab, ylab = ylab, ...)
   if (grepl("sig", model)) {
     FUNmod <- fsig
@@ -165,27 +163,27 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
     FUNinv <- flinInv
   }
 
-  out <- normalizeSmp(smp, smpvar, resvar, dilvar, FUNinv, finfit$par,
-                       finfit$bounds, finfit$flag, fitlog, trim.flat)
+  dfout <- normalizeSmp(smp, smpvar, resvar, dilvar, FUNinv, finfit$par,
+                        finfit$bounds, finfit$flag, fitlog, trim.flat)
 
   fplot <- paste(plotdir, pname, ".pdf", sep = "")
   pdf(file = fplot, width = width, height = height)
   if (!is.null(finfit$par)) {
-    trimval <- out[1, c("trim_lo", "trim_up")]
-    trimext <- (trimval == out[1, c("min", "max")]) + 1  # at extrema
+    trimval <- dfout[1, c("trim_lo", "trim_up")]
+    trimext <- (trimval == dfout[1, c("min", "max")]) + 1  # at extrema
     plotFit(std, xvar, yvar, dilvar, finfit$par, FUNmod, finfit$iout, bg,
-            out[, smpvar], out[, "Flag"], trimval, trimext, rugcol, stdcol,
-            main = ptitle, xlab = xlab, ylab = ylab, ...)
+            dfout[ismp, smpvar], dfout[ismp, "Flag"], trimval, trimext,
+            stdcol, rugcol, main = ptitle, xlab = xlab, ylab = ylab, ...)
   } else {
-    plotFit(std, xvar, yvar, dilvar, iout = finfit$out, bg = bg,
-            vsmp = out[, smpvar], rugcol = rugcol, stdcol = stdcol,
+    plotFit(std, xvar, yvar, dilvar, iout = finfit$iout, bg = bg,
+            vsmp = dfout[ismp, smpvar], stdcol = stdcol, rugcol = rugcol,
             main = ptitle, xlab = xlab, ylab = ylab, ...)
   }
   dev.off()
   options(warn = 0)
-  #  return(list(smp = out, fitflag = finfit$flag))  #*** if not below
+  #  return(list(smp = dfout, fitflag = finfit$flag))  #*** if not below
   #***================ optional: number of trimmed samples =================***#
-  return(list(smp = out, fitflag = finfit$flag, ntrim = sum(out$trimmed)))
+  return(list(smp = dfout, fitflag = finfit$flag, ntrim = sum(dfout$trimmed)))
 }
 
 

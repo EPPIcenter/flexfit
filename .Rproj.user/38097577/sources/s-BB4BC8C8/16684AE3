@@ -5,15 +5,15 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "2275006715",
+    "hash" : "0",
     "id" : "16684AE3",
-    "lastKnownWriteTime" : 1594689542,
-    "last_content_update" : 1594689542572,
+    "lastKnownWriteTime" : 1594694051,
+    "last_content_update" : 1594694051920,
     "path" : "~/Documents/Research/Malaria/flexfit/R/plotFit.R",
     "project_path" : "R/plotFit.R",
     "properties" : {
-        "cursorPosition" : "19,0",
-        "scrollLine" : "13"
+        "cursorPosition" : "17,53",
+        "scrollLine" : "0"
     },
     "read_only" : false,
     "read_only_alternatives" : [

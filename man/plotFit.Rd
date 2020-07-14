@@ -6,9 +6,8 @@
 \usage{
 plotFit(std, xvar, yvar, dilvar, fitpar = NULL, FUNmod = NULL,
   iout = NULL, bg = NULL, vsmp = NULL, smpflag = NULL,
-  trimval = NULL, trimext = NULL, rugcol = c("cadetblue",
-  "darkorchid3", "firebrick3"), stdcol = c("aquamarine4", "aquamarine3"),
-  ...)
+  trimval = NULL, trimext = NULL, stdcol = c("firebrick3",
+  "darkslategray"), rugcol = c("cadetblue", "purple", "firebrick2"), ...)
 }
 \arguments{
 \item{std}{matrix or data frame with standards for fitting.}
@@ -40,12 +39,12 @@ trimmed.}
 \item{trimext}{integer vector of length two indicating if the values are
 trimmed at the extremum (lower and upper).}
 
+\item{stdcol}{vector of two colors for the standard points and the fit on the
+plot.}
+
 \item{rugcol}{vector of three colors for the rugplot, which indicates sample
 values (inside the bounds, between the bounds and extrema, and beyond
 extrema).}
-
-\item{stdcol}{vector of two colors for the standard points and the fit on the
-plot.}
 
 \item{...}{further graphical parameters.}
 }

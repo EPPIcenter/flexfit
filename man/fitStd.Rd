@@ -9,7 +9,7 @@ fitStd(std, xvar, yvar, dilvar, model = "sigmoid", Alow = NULL,
   rm.before = FALSE, rm.after = interactive, maxrm = 2,
   set.bounds = FALSE, overwrite.bounds = FALSE, bg = NULL,
   vsmp = NULL, optmethod = "Nelder-Mead", maxit = 5000, info = "",
-  ifix = NULL, rugcol, ...)
+  ifix = NULL, stdcol, rugcol, ...)
 }
 \arguments{
 \item{std}{matrix or data frame with standards for fitting.}
@@ -74,6 +74,9 @@ automatically set bounds. Ignored if \code{interactive} is \code{FALSE}.}
 
 \item{ifix}{sorted integer vector of length 3 with indices of standards to be
 used for getting starting values for optimization.}
+
+\item{stdcol}{vector of two colors for the standard points and the fit on the
+plot.}
 
 \item{rugcol}{vector of three colors for the rugplot, which indicates sample
 values (inside the bounds, between the bounds and extrema, and beyond
