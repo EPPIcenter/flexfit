@@ -5,15 +5,15 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "0",
+    "hash" : "1911965015",
     "id" : "E2771AEF",
-    "lastKnownWriteTime" : 1594700763,
-    "last_content_update" : 1594700763653,
+    "lastKnownWriteTime" : 1595277996,
+    "last_content_update" : 1595277996570,
     "path" : "~/Documents/Research/Malaria/flexfit/R/fitStd.R",
     "project_path" : "R/fitStd.R",
     "properties" : {
-        "cursorPosition" : "11,73",
-        "scrollLine" : "0"
+        "cursorPosition" : "30,3",
+        "scrollLine" : "16"
     },
     "read_only" : false,
     "read_only_alternatives" : [
