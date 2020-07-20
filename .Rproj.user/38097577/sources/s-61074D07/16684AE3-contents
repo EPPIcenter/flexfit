@@ -33,7 +33,7 @@ plotFit <- function(std, xvar, yvar, dilvar, fitpar = NULL, FUNmod = NULL,
                     stdcol = c("firebrick3", "darkslategray"),
                     rugcol = c("cadetblue", "purple", "firebrick2"), ...) {
   if (!hasArg(ylim)) {
-    ylim <- range(std[, yvar], vsmp, log(bg), na.rm = TRUE)
+    ylim <- range(std[, yvar], vsmp, bg, na.rm = TRUE)
     plot(std[, xvar], std[, yvar], col = stdcol[1], xaxt = "n", ylim = ylim,
          lwd = 1.3, ...)
   } else {
@@ -53,7 +53,7 @@ plotFit <- function(std, xvar, yvar, dilvar, fitpar = NULL, FUNmod = NULL,
     labs = round(std[, xvar], 3)
   }
   axis(side = 1, at = std[, xvar], cex.axis = 0.7, tcl = -0.1, labels = labs)
-  abline(h = log(bg), lty = 3)
+  abline(h = bg, lty = 3)
   if (!is.null(iout)) {
     points(std[iout, xvar], std[iout, yvar], col = 2, pch = 4, cex = 2)
   }

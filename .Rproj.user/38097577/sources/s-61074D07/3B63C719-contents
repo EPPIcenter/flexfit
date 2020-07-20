@@ -146,6 +146,7 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
     smpvar <- paste("log", smpvar, sep = "")
     std[, yvar]   <- log(std[, yvar])
     smp[, smpvar] <- log(smp[, oldvar])
+    if (!is.null(bg)) bg <- log(bg)
     ylab <- paste("log", yvar)
   }
   std <- std[order(std[, xvar]), ]       # sorted by increasing xvar

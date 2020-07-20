@@ -7,12 +7,12 @@
     "folds" : "",
     "hash" : "0",
     "id" : "E2771AEF",
-    "lastKnownWriteTime" : 1595277996,
-    "last_content_update" : 1595277996570,
+    "lastKnownWriteTime" : 1595279224,
+    "last_content_update" : 1595279224631,
     "path" : "~/Documents/Research/Malaria/flexfit/R/fitStd.R",
     "project_path" : "R/fitStd.R",
     "properties" : {
-        "cursorPosition" : "34,76",
+        "cursorPosition" : "28,54",
         "scrollLine" : "16"
     },
     "read_only" : false,

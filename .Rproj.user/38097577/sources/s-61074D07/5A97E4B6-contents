@@ -1,0 +1,93 @@
+install_github("EPPIcenter/flexfit")
+library(flexfit)
+library(dplyr)
+library(ggplot2)
+
+## Simulate data on standards
+std <- data.frame(
+	dilution=paste0("1/", 2^c(10:0)),
+	dilution_numeric=2^c(10:0),
+	OD=2*plogis(seq(-5,5,by=1)))
+std$concentration <- 1/std$dilution_numeric
+
+std %>%
+	mutate(dilution_factor=factor(dilution, levels=paste0("1/", 2^c(10:0)))) %>%
+	ggplot(aes(x=dilution_factor, y=OD)) +
+		geom_point() +
+		theme_bw()
+
+#fitStd(std=std, xvar="dilution_numeric", yvar="OD", dilvar="dilution_numeric")
+fitStd(std=std, xvar="concentration", yvar="OD", dilvar="dilution_numeric")
+
+## Simulate data on samples
+smp <- data.frame(sample_ID=1:100, sample_values=exp(rnorm(100)))
+
+processSmp(smp=smp, std=std, xvar = "concentration", yvar = "OD",
+           smpvar = "sample_values")
+
+
+
+  if (inherits(smp, "matrix")) {
+    smp <- as.data.frame(smp)
+  }
+  if (is.null(xvar) || is.null(yvar)) {  # first two columns assumed to be x, y
+    colnames(std) <- c("x", "y")
+    xvar <- "x"
+    yvar <- "y"
+  }
+  if (is.null(smpvar)) {                 # 2nd column assumed to be samples
+    smpvar           <- "Sample"
+    colnames(smp)[2] <- "Sample"
+  }
+  if (!is.null(addvar)) {                # variables added
+    for (i in 1:length(addvar)) {
+      smp[, names(addvar[i])] <- addvar[i]
+    }
+  }
+  if (is.null(dilvar)) {                 # can be removed after processing if 1
+    dilvar <- "Dilution"
+    smp[, dilvar] <- smpdil
+  }
+  if (is.null(pname)) {                  # plot title used for pdf name
+    pname <- gsub("[[:space:]]", "_", ptitle)
+  }
+  xlab <- xvar
+  ylab <- yvar
+  if (grepl("x", fitlog)) {
+    std[, xvar] <- log(std[, xvar])
+    xlab <- paste("log", xvar)
+  }
+  if (grepl("y", fitlog)) {
+    oldvar <- smpvar                     # reassign smpvar
+    smpvar <- paste("log", smpvar, sep = "")
+    std[, yvar]   <- log(std[, yvar])
+    smp[, smpvar] <- log(smp[, oldvar])
+    ylab <- paste("log", yvar)
+  }
+  std <- std[order(std[, xvar]), ]       # sorted by increasing xvar
+
+  finfit <- fitStd(std, xvar, yvar)
+
+  fitStd <- function(std, xvar, yvar, dilvar,
+                   model = "sigmoid", Alow = NULL, asym = TRUE,
+                   interactive = TRUE, monot.prompt = FALSE,
+                   rm.before = FALSE, rm.after = interactive, maxrm = 2,
+                   set.bounds = FALSE, overwrite.bounds = FALSE, bg = NULL,
+                   vsmp = NULL, optmethod = "Nelder-Mead", maxit = 5e3,
+                   info = "", ifix = NULL, stdcol, rugcol, ...) {
+  if (!is.null(Alow) && Alow == "bg") {
+  	Alow <- mean(log(bg))
+  }  #*** or log(mean(bg))
+
+
+
+
+
+
+
+
+
+
+
+
+

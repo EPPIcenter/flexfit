@@ -26,9 +26,7 @@ fitStd <- function(std, xvar, yvar, dilvar,
                    set.bounds = FALSE, overwrite.bounds = FALSE, bg = NULL,
                    vsmp = NULL, optmethod = "Nelder-Mead", maxit = 5e3,
                    info = "", ifix = NULL, stdcol, rugcol, ...) {
-  if (!is.null(Alow) && Alow == "bg") {
-    Alow <- mean(log(bg))  #*** or log(mean(bg))
-  }
+  if (!is.null(Alow) && Alow == "bg") Alow <- mean(bg)  # on a log scale
   flag <- ""
   iout <- NULL
   monot <- all(diff(std[, yvar]) > -1e-9)  # std already sorted by xvar
