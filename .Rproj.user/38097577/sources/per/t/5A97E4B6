@@ -1,24 +1,24 @@
 {
     "collab_server" : "",
     "contents" : "",
-    "created" : 1594617533186.000,
+    "created" : 1595278260708.000,
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "0",
-    "id" : "1E7B0B95",
-    "lastKnownWriteTime" : 1594371051,
-    "last_content_update" : 1594371051,
-    "path" : "~/Documents/Research/Edgeworth/testtemp.R",
+    "hash" : "3516957459",
+    "id" : "5A97E4B6",
+    "lastKnownWriteTime" : 1595278382,
+    "last_content_update" : 1595278382419,
+    "path" : "~/Downloads/flexfit_sim.R",
     "project_path" : null,
     "properties" : {
-        "cursorPosition" : "13,10",
+        "cursorPosition" : "3,16",
         "scrollLine" : "0"
     },
     "read_only" : false,
     "read_only_alternatives" : [
     ],
-    "relative_order" : 2,
+    "relative_order" : 8,
     "source_on_save" : false,
     "source_window" : "",
     "type" : "r_source"

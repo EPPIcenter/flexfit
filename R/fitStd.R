@@ -29,7 +29,8 @@ fitStd <- function(std, xvar, yvar, dilvar,
   if (!is.null(Alow) && Alow == "bg") Alow <- mean(bg)  # on a log scale
   flag <- ""
   iout <- NULL
-  monot <- all(diff(std[, yvar]) > -1e-9)  # std already sorted by xvar
+  std <- std[order(std[, xvar]), ]         # sort std by increasing xvar
+  monot <- all(diff(std[, yvar]) > -1e-9)
   if (!monot) warning(paste(info, yvar, "not strictly increasing in standards"))
   if (interactive) {
     if (!rm.before && !rm.after) {

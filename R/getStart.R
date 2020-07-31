@@ -8,7 +8,7 @@ vtoA <- function(ys, v, b, xfix, ifix) {
 }
 
 getStart4par <- function(x, y, ifix = NULL, nv = 10, info = "") {
-  y <- tapply(y, x, mean, names = NULL)  # tapply output is ordered by x
+  y <- tapply(y, x, mean)  # tapply output is ordered by x
   names(y) <- NULL
   x <- sort(unique(x))
   n <- length(x)
@@ -49,12 +49,17 @@ getStart4par <- function(x, y, ifix = NULL, nv = 10, info = "") {
     while(rmin$w <= 0) {
       imin <- high*(imin - 1) + (!high)*(imin + 1)  # increment/decrement imin
       vmin <- vval[imin]
+      wold <- rmin$w
       rmin <- vtoA(yshift, vmin, b, xfix, ifix)
+      wnew <- rmin$w
+      if (wnew < wold) {
+        break
+      }
     }
   }
   #============================================================================#
 
-  if (rmin$w <= 0) {  #*** possibly unnecessary with the update?
+  if (rmin$w <= 0) {
     return(NA)
   }
   A0 <- y[ifix[1]] - rmin$A/(1 + rmin$w*vmin^(xfix[1]))

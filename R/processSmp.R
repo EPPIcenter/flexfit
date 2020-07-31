@@ -149,7 +149,6 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
     if (!is.null(bg)) bg <- log(bg)
     ylab <- paste("log", yvar)
   }
-  std <- std[order(std[, xvar]), ]       # sorted by increasing xvar
 
   finfit <- fitStd(std, xvar, yvar, dilvar, model, Alow, asym, interactive,
                    monot.prompt, rm.before, rm.after, maxrm, set.bounds,
