@@ -111,8 +111,11 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
                        rugcol = c("cadetblue", "purple", "firebrick2"),
                        width = 7, height = 6, ...) {
   options(warn = 1)    # for interactivity
-  if (inherits(smp, "matrix")) {
+  if (!inherits(smp, "data.frame")) {
     smp <- as.data.frame(smp)
+  }
+  if (!(inherits(std, "matrix") || inherits(std, "data.frame"))) {
+    std <- as.data.frame(std)
   }
   if (is.null(xvar) || is.null(yvar)) {  # first two columns assumed to be x, y
     colnames(std) <- c("x", "y")
