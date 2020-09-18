@@ -43,7 +43,8 @@ are included in \code{smp} data frame).}
 \item{ptitle}{character string for plot title.}
 
 \item{xvar, yvar}{character strings for the variables used to fit a standard
-curve.}
+curve. If \code{NULL}, first two columns are assumed to be \code{x} and
+\code{y} variables.}
 
 \item{smpvar}{character string indicating sample variable.}
 

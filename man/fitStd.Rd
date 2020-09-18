@@ -15,10 +15,12 @@ fitStd(std, xvar, yvar, dilvar, model = "sigmoid", Alow = NULL,
 \item{std}{matrix or data frame with standards for fitting.}
 
 \item{xvar}{character strings for the variables used to fit a standard
-curve.}
+curve. If \code{NULL}, first two columns are assumed to be \code{x} and
+\code{y} variables.}
 
 \item{yvar}{character strings for the variables used to fit a standard
-curve.}
+curve. If \code{NULL}, first two columns are assumed to be \code{x} and
+\code{y} variables.}
 
 \item{dilvar}{character string to check if there is a dilution variable in
 \code{std}. If found, used for x-axis labels only.}

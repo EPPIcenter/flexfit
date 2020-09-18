@@ -25,7 +25,8 @@
 #'   \code{ptitle} with underscore substituted for space.
 #' @param ptitle character string for plot title.
 #' @param xvar,yvar character strings for the variables used to fit a standard
-#'   curve.
+#'   curve. If \code{NULL}, first two columns are assumed to be \code{x} and
+#'   \code{y} variables.
 #' @param smpvar character string indicating sample variable.
 #' @param addvar named vector for additional variables (e.g. date or plate),
 #'   where element names will be used as variable names in \code{smp}.
