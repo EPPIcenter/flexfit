@@ -27,7 +27,7 @@ getStart4par <- function(x, y, ifix = NULL, nv = 10, info = "") {
     v <- vval[i]
     r <- vtoA(yshift, v, b, xfix, ifix)
     ss[i] <- sum((yshift[ivar] - r$A*(1/(1 + r$w*v^(x[ivar])) -
-                                          1/(1 + r$w*v^(xfix[1]))))^2)
+                                        1/(1 + r$w*v^(xfix[1]))))^2)
   }
   imin <- which.min(ss)
   # check fit: SS (sum of squares) too large

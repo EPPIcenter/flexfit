@@ -19,13 +19,16 @@
 #'
 #' @export
 
-fitStd <- function(std, xvar, yvar, dilvar,
+fitStd <- function(std, xvar, yvar, dilvar = "Dilution",
                    model = "sigmoid", Alow = NULL, asym = TRUE,
                    interactive = TRUE, monot.prompt = FALSE,
                    rm.before = FALSE, rm.after = interactive, maxrm = 2,
                    set.bounds = FALSE, overwrite.bounds = FALSE, bg = NULL,
                    vsmp = NULL, optmethod = "Nelder-Mead", maxit = 5e3,
-                   info = "", ifix = NULL, stdcol, rugcol, ...) {
+                   info = "", ifix = NULL,
+                   stdcol = c("firebrick3", "darkslategray"),
+                   rugcol = c("cadetblue", "purple", "firebrick2"), ...) {
+  options(warn = 1)                        # for interactivity
   if (!is.null(Alow) && Alow == "bg") Alow <- mean(bg)  # on a log scale
   flag <- ""
   iout <- NULL
@@ -49,7 +52,8 @@ fitStd <- function(std, xvar, yvar, dilvar,
     plotFit(std, xvar, yvar, dilvar, bg = bg, vsmp = vsmp,
             stdcol = stdcol, rugcol = rugcol, ...)
     for (i in 1:maxrm) {
-      ans1 <- readline("Remove any outliers? (y/n) ")
+      wd <- ifelse(i == 1, "any", "more")
+      ans1 <- readline(paste("Remove", wd, "outliers? (y/n) "))
       if (tolower(ans1) == "y"){
         flag <- "pts_rm"
         mtext("Click on an outlier", col = "red", cex = 1.2)
@@ -120,21 +124,23 @@ fitStd <- function(std, xvar, yvar, dilvar,
     mindet <- max(min(std1[, yvar]), fitpar["Alow"])
     maxdet <- min(max(std1[, yvar]), fitpar["Aup"])
     smpflag[!(mindet <= vsmp & vsmp <= maxdet)] <- "min"
-    plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod, bg = bg,
+    plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod,
+            iout = iout, bg = bg,
             vsmp = vsmp, smpflag = smpflag, stdcol = stdcol, rugcol = rugcol,
             ...)
     #*** end INSERTED, uncomment plotFit() below
-#    plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod, bg = bg,
-#            vsmp = vsmp, stdcol = stdcol, rugcol = rugcol, ...)
+    #    plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod, bg = bg,
+    #            vsmp = vsmp, stdcol = stdcol, rugcol = rugcol, ...)
 
     for (i in 1:maxrm) {
-      ans1 <- readline("Remove any outliers? (y/n) ")
+      wd <- ifelse(i == 1, "any", "more")
+      ans1 <- readline(paste("Remove", wd, "outliers? (y/n) "))
       if (tolower(ans1) == "y"){
         flag <- "pts_rm"
         mtext("Click on an outlier", col = "red", cex = 1.2)
         out  <- locator(n = 1)
         iout <- c(iout, locatePt(out$x, out$y, std[, xvar], std[, yvar]))
-        points(std[iout, xvar], std[iout, yvar], col = 2, pch = 4, cex = 2)
+        #        points(std[iout, xvar], std[iout, yvar], col = 2, pch = 4, cex = 2)
         if (grepl("sig", model)) {
           if (!is.null(Alow)) {
             startval <- getStart3par(std[-iout, xvar], std[-iout, yvar], Alow,
@@ -163,12 +169,12 @@ fitStd <- function(std, xvar, yvar, dilvar,
         maxdet <- min(max(std1[, yvar]), fitpar["Aup"])
         smpflag[!(mindet <= vsmp & vsmp <= maxdet)] <- "min"
         plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod,
-                bg = bg, vsmp = vsmp, smpflag = smpflag,
+                iout = iout, bg = bg, vsmp = vsmp, smpflag = smpflag,
                 stdcol = stdcol, rugcol = rugcol, ...)
         #*** end INSERTED, uncomment plotFit() below
-#        plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod,
-#                iout = iout, bg = bg, vsmp = vsmp,
-#                stdcol = stdcol, rugcol = rugcol,...)
+        #        plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod,
+        #                iout = iout, bg = bg, vsmp = vsmp,
+        #                stdcol = stdcol, rugcol = rugcol,...)
       } else {         # answer no
         if (i == 1) {  # answer no for the first time
           revise <- FALSE
@@ -186,7 +192,7 @@ fitStd <- function(std, xvar, yvar, dilvar,
           flag <- ans3
         }
       }
-  }
+    }
   }
   ystd <- std[, yvar]
   if (!is.null(iout)) ystd <- ystd[-iout]
@@ -200,11 +206,6 @@ fitStd <- function(std, xvar, yvar, dilvar,
   #---------------------------- calculate bounds ------------------------------#
   if (grepl("sig", model)) {
     bounds <- c(bounds, calcBoundsSig(fitpar, range(std[, xvar])))
-    if (length(bounds) == 2) {
-      warning(paste(info,
-                    "Fit is not good, try estimating lower asymptote if fixed"))
-      return(list(par = NULL, bounds = bounds, iout = iout, flag = "no_fit"))
-    }
   } else {}
   if (rm.after) {
     abline(h = bounds[c("lowerbound", "upperbound")], col = rugcol[2], lty = 4)
@@ -221,7 +222,7 @@ fitStd <- function(std, xvar, yvar, dilvar,
     }
     if (overlower || overwrite.bounds) {
       ans1 <- readline("Set lower bound manually? (y/n) ")
-      if (tolower(ans1) == "y"){
+      if (tolower(ans1) == "y") {
         revise <- TRUE
         flag <- paste(flag, ", lb_manual", sep = "")
         if (!rm.after) {  # no active current plot
@@ -232,12 +233,12 @@ fitStd <- function(std, xvar, yvar, dilvar,
           maxdet <- min(max(std1[, yvar]), fitpar["Aup"])
           smpflag[!(mindet <= vsmp & vsmp <= maxdet)] <- "min"
           plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod,
-                  bg = bg, vsmp = vsmp, smpflag = smpflag,
+                  iout = iout, bg = bg, vsmp = vsmp, smpflag = smpflag,
                   stdcol = stdcol, rugcol = rugcol, ...)
           #*** end INSERTED, uncomment plotFit() below
-#          plotFit(std, xvar, yvar, dilvar, fitpar = fit$par, FUNmod = FUNmod,
-#                  iout = iout, bg = bg, vsmp = vsmp,
-#                  stdcol = stdcol, rugcol = rugcol, ...)
+          #          plotFit(std, xvar, yvar, dilvar, fitpar = fit$par, FUNmod = FUNmod,
+          #                  iout = iout, bg = bg, vsmp = vsmp,
+          #                  stdcol = stdcol, rugcol = rugcol, ...)
           abline(h = bounds[c("lowerbound", "upperbound")], col = rugcol[2],
                  lty = 4)
           legend("right", bty = "n", cex = 0.9, col = rugcol[2], lty = 4,
@@ -290,6 +291,7 @@ fitStd <- function(std, xvar, yvar, dilvar,
       }
     }
   }
+  options(warn = 0)
   return(list(par = fitpar, bounds = bounds, iout = iout, flag = flag))
 }
 

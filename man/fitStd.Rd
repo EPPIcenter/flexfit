@@ -4,12 +4,13 @@
 \alias{fitStd}
 \title{Fit Standards}
 \usage{
-fitStd(std, xvar, yvar, dilvar, model = "sigmoid", Alow = NULL,
-  asym = TRUE, interactive = TRUE, monot.prompt = FALSE,
-  rm.before = FALSE, rm.after = interactive, maxrm = 2,
-  set.bounds = FALSE, overwrite.bounds = FALSE, bg = NULL,
-  vsmp = NULL, optmethod = "Nelder-Mead", maxit = 5000, info = "",
-  ifix = NULL, stdcol, rugcol, ...)
+fitStd(std, xvar, yvar, dilvar = "Dilution", model = "sigmoid",
+  Alow = NULL, asym = TRUE, interactive = TRUE,
+  monot.prompt = FALSE, rm.before = FALSE, rm.after = interactive,
+  maxrm = 2, set.bounds = FALSE, overwrite.bounds = FALSE,
+  bg = NULL, vsmp = NULL, optmethod = "Nelder-Mead", maxit = 5000,
+  info = "", ifix = NULL, stdcol = c("firebrick3", "darkslategray"),
+  rugcol = c("cadetblue", "purple", "firebrick2"), ...)
 }
 \arguments{
 \item{std}{matrix or data frame with standards for fitting.}

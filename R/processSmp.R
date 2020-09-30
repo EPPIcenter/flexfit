@@ -111,7 +111,6 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
                        stdcol = c("firebrick3", "darkslategray"),
                        rugcol = c("cadetblue", "purple", "firebrick2"),
                        width = 7, height = 6, ...) {
-  options(warn = 1)    # for interactivity
   if (!inherits(smp, "data.frame")) {
     smp <- as.data.frame(smp)
   }
@@ -153,6 +152,7 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
     if (!is.null(bg)) bg <- log(bg)
     ylab <- paste("log", yvar)
   }
+  std <- std[order(std[, xvar]), ]       # for iout; also sorted in fitStd()
 
   finfit <- fitStd(std, xvar, yvar, dilvar, model, Alow, asym, interactive,
                    monot.prompt, rm.before, rm.after, maxrm, set.bounds,
@@ -184,7 +184,6 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
             main = ptitle, xlab = xlab, ylab = ylab, ...)
   }
   dev.off()
-  options(warn = 0)
   #  return(list(smp = dfout, fitflag = finfit$flag))  #*** if not below
   #***================ optional: number of trimmed samples =================***#
   return(list(smp = dfout, fitflag = finfit$flag, ntrim = sum(dfout$trimmed)))
