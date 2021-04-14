@@ -4,8 +4,7 @@
 \alias{read_data}
 \title{Read in raw luminex data}
 \usage{
-read_data(fname, dtype = "Median", nwells = NULL, nsep = 2,
-  ncolmax = 105)
+read_data(fname, dtype = "Median", nwells = NULL, nsep = 2, ncolmax = 105)
 }
 \arguments{
 \item{fname}{name of the file that contains raw data.}

@@ -4,17 +4,42 @@
 \alias{processSmp}
 \title{Process raw Luminex files}
 \usage{
-processSmp(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
-  ismp = 1:nrow(smp), plotdir = "./", pname = NULL,
-  ptitle = "fit and samples", xvar = NULL, yvar = NULL,
-  smpvar = NULL, addvar = NULL, dilvar = NULL, resvar = NULL,
-  model = "sigmoid", Alow = NULL, asym = TRUE, trim.flat = TRUE,
-  interactive = TRUE, monot.prompt = FALSE, rm.before = FALSE,
-  rm.after = interactive, maxrm = 2, set.bounds = interactive,
-  overwrite.bounds = FALSE, ifix = NULL, optmethod = "Nelder-Mead",
-  maxit = 5000, stdcol = c("firebrick3", "darkslategray"),
-  rugcol = c("cadetblue", "purple", "firebrick2"), width = 7,
-  height = 6, ...)
+processSmp(
+  smp,
+  std,
+  bg = NULL,
+  smpdil = 1,
+  fitlog = "xy",
+  ismp = 1:nrow(smp),
+  plotdir = "./",
+  pname = NULL,
+  ptitle = "fit and samples",
+  xvar = NULL,
+  yvar = NULL,
+  smpvar = NULL,
+  addvar = NULL,
+  dilvar = NULL,
+  resvar = NULL,
+  model = "sigmoid",
+  Alow = NULL,
+  asym = TRUE,
+  trim.flat = TRUE,
+  interactive = TRUE,
+  monot.prompt = FALSE,
+  rm.before = FALSE,
+  rm.after = interactive,
+  maxrm = 2,
+  set.bounds = interactive,
+  overwrite.bounds = FALSE,
+  ifix = NULL,
+  optmethod = "Nelder-Mead",
+  maxit = 5000,
+  stdcol = c("firebrick3", "darkslategray"),
+  rugcol = c("cadetblue", "purple", "firebrick2"),
+  width = 7,
+  height = 6,
+  ...
+)
 }
 \arguments{
 \item{smp}{data frame with sample ID, sample values and other optional

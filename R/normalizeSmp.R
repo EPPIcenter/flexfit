@@ -43,14 +43,16 @@ normalizeSmp <- function(smp, smpvar, resvar, dilvar, FUNinv, par, bounds,
   smp$Flag[imin]  <- "below_min"                   # overwrites
   smp$Flag[imax]  <- "above_max"                   # overwrites
 
-  if (trim.flat && !is.na(bounds["lowerbound"])) {
+  if (trim.flat && !is.na(bounds["lowerbound"]) &&
+      bounds["lowerbound"] > bounds["mindet"]) {
     ilo <- ilobd
     smp$trim_lo <- bounds["lowerbound"]
   } else {
     ilo <- imin
     smp$trim_lo <- bounds["mindet"]
   }
-  if (trim.flat && !is.na(bounds["upperbound"])) {
+  if (trim.flat && !is.na(bounds["upperbound"]) &&
+      bounds["upperbound"] < bounds["maxdet"]) {
     iup <- iupbd
     smp$trim_up <- bounds["upperbound"]
   } else {
@@ -69,3 +71,5 @@ normalizeSmp <- function(smp, smpvar, resvar, dilvar, FUNinv, par, bounds,
   smp$trimmed[c(ilo, iup)] <- TRUE
   return(smp)
 }
+
+#*** problem!!! need min of bound and detection!!!

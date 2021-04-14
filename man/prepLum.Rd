@@ -4,10 +4,20 @@
 \alias{prepLum}
 \title{Reformat raw luminex files for processing}
 \usage{
-prepLum(antigen, fname, fdir = NULL, dtype = "Median",
-  stdstr = "std|stand", bgstr = "blank|background", stddil = NULL,
-  smpdil = 1000, nwells = NULL, nsep = 2, ncolmax = 105,
-  dformat = "\%m/\%d/\%Y")
+prepLum(
+  antigen,
+  fname,
+  fdir = NULL,
+  dtype = "Median",
+  stdstr = "std|stand",
+  bgstr = "blank|background",
+  stddil = NULL,
+  smpdil = 1000,
+  nwells = NULL,
+  nsep = 2,
+  ncolmax = 105,
+  dformat = "\%m/\%d/\%Y"
+)
 }
 \arguments{
 \item{antigen}{character string.}

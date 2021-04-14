@@ -4,8 +4,18 @@
 \alias{normalizeSmp}
 \title{Normalize Samples}
 \usage{
-normalizeSmp(smp, smpvar, resvar, dilvar, FUNinv, par, bounds, fitflag,
-  fitlog, trim.flat = TRUE)
+normalizeSmp(
+  smp,
+  smpvar,
+  resvar,
+  dilvar,
+  FUNinv,
+  par,
+  bounds,
+  fitflag,
+  fitlog,
+  trim.flat = TRUE
+)
 }
 \arguments{
 \item{smp}{data frame containing samples}

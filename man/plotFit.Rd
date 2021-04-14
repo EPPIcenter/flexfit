@@ -4,10 +4,23 @@
 \alias{plotFit}
 \title{Plot the fit for standards and the samples}
 \usage{
-plotFit(std, xvar, yvar, dilvar, fitpar = NULL, FUNmod = NULL,
-  iout = NULL, bg = NULL, vsmp = NULL, smpflag = NULL,
-  trimval = NULL, trimext = NULL, stdcol = c("firebrick3",
-  "darkslategray"), rugcol = c("cadetblue", "purple", "firebrick2"), ...)
+plotFit(
+  std,
+  xvar,
+  yvar,
+  dilvar,
+  fitpar = NULL,
+  FUNmod = NULL,
+  iout = NULL,
+  bg = NULL,
+  vsmp = NULL,
+  smpflag = NULL,
+  trimval = NULL,
+  trimext = NULL,
+  stdcol = c("firebrick3", "darkslategray"),
+  rugcol = c("cadetblue", "purple", "firebrick2"),
+  ...
+)
 }
 \arguments{
 \item{std}{matrix or data frame with standards for fitting.}
