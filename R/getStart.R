@@ -106,7 +106,8 @@ getvwGen <- function(yshift, c21, c31, x3, nv = 10, niter = 3) {
 }
 
 # optionally: when called, use ifix = c(1, floor(n/2) + 1 , n)
-getStart3par <- function(x, y, A0, a = 1, ifix = NULL, nv = 10, niter = 3) {
+getStart3par <- function(x, y, A0, a = 1, ifix = NULL, nv = 10, niter = 3,
+                         off0 = 1e-3) {
   y <- tapply(y, x, mean)  # tapply output is ordered by x
   names(y) <- NULL
   x <- sort(unique(x))
@@ -133,6 +134,9 @@ getStart3par <- function(x, y, A0, a = 1, ifix = NULL, nv = 10, niter = 3) {
   x3 <- x[ifix]
   y3 <- y[ifix]
   yshift <- y3 - A0
+  if (yshift[1] >= -off0 && yshift[1] <= 0) {
+    yshift[1] <- off0
+  }
   c21 <- (yshift[2]/yshift[1])^(1/a)
   c31 <- (yshift[3]/yshift[1])^(1/a)
   if (!all(diff(c(1, c21, c31)) > 0)) {
