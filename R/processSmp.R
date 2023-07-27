@@ -68,6 +68,13 @@
 #'   automatically set bounds. Ignored if \code{interactive} is \code{FALSE}.
 #' @param ifix sorted integer vector of length 3 with indices of standards to be
 #'   used for getting starting values for optimization.
+#'
+#' @param extrapolate.low if \code{TRUE}, sample values beyond lower bounds will
+#'   be processed by extrapolation of the standard curve (not recommended).
+#'   Takes precedence over \code{trim.flat} value.
+#' @param extrapolate.up if \code{TRUE}, sample values beyond upper bounds will
+#'   be processed by extrapolation of the standard curve (not recommended).
+#'   Takes precedence over \code{trim.flat} value.
 
 #' @param optmethod method to be used in optimization.
 #' @param maxit maximum number of iterations in optimization.
@@ -88,7 +95,7 @@
 #'
 #' @examples
 #'
-#' @importFrom grDevices dev.off pdf
+#' @importFrom grDevices pdf dev.off adjustcolor
 #' @importFrom graphics abline axis legend lines locator mtext plot points rug
 #' @importFrom methods hasArg
 #' @importFrom stats optim
@@ -106,7 +113,9 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
                        monot.prompt = FALSE,
                        rm.before = FALSE, rm.after = interactive, maxrm = 2,
                        set.bounds = interactive, overwrite.bounds = FALSE,
-                       ifix = NULL, optmethod = "Nelder-Mead", maxit = 5e3,
+                       ifix = NULL,
+                       extrapolate.low = FALSE, extrapolate.up = FALSE,
+                       optmethod = "Nelder-Mead", maxit = 5e3,
                        # nv3 = 10, nv4 = 100, # then include in fitStd() as well
                        stdcol = c("firebrick3", "darkslategray"),
                        rugcol = c("cadetblue", "purple", "firebrick2"),
@@ -168,7 +177,8 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
   }
 
   dfout <- normalizeSmp(smp, smpvar, resvar, dilvar, FUNinv, finfit$par,
-                        finfit$bounds, finfit$flag, fitlog, trim.flat)
+                        finfit$bounds, finfit$flag, fitlog, trim.flat,
+                        extrapolate.low, extrapolate.up)
 
   fplot <- paste(plotdir, pname, ".pdf", sep = "")
   pdf(file = fplot, width = width, height = height)

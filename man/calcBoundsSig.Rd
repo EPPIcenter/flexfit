@@ -21,6 +21,3 @@ indicate "flat" portions of the curve.
 \details{
 to be added
 }
-\examples{
-
-}
