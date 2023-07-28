@@ -8,7 +8,6 @@ fitStd(
   std,
   xvar,
   yvar,
-  dilvar = "Dilution",
   model = "sigmoid",
   Alow = NULL,
   asym = TRUE,
@@ -25,6 +24,7 @@ fitStd(
   maxit = 5000,
   info = "",
   ifix = NULL,
+  tcklab = NULL,
   stdcol = c("firebrick3", "darkslategray"),
   rugcol = c("cadetblue", "purple", "firebrick2"),
   ...
@@ -36,9 +36,6 @@ fitStd(
 \item{xvar, yvar}{character strings for the variables used to fit a standard
 curve. If \code{NULL}, first two columns are assumed to be \code{x} and
 \code{y} variables.}
-
-\item{dilvar}{character string to check if there is a dilution variable in
-\code{std}. If found, used for x-axis labels only.}
 
 \item{model}{the model to be fit.}
 
@@ -91,6 +88,8 @@ automatically set bounds. Ignored if \code{interactive} is \code{FALSE}.}
 
 \item{ifix}{sorted integer vector of length 3 with indices of standards to be
 used for getting starting values for optimization.}
+
+\item{tcklab}{tick labels for x-axis.}
 
 \item{stdcol}{vector of two colors for the standard points and the fit on the
 plot.}

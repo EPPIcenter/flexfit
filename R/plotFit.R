@@ -22,14 +22,15 @@ locatePt <- function(ptx, pty, datx, daty) {
 #'   trimmed.
 #' @param trimext integer vector of length two indicating if the values are
 #'   trimmed at the extremum (lower and upper).
+#' @param tcklab  tick labels for x-axis.
 #' @inheritParams fitStd
 #' @inheritParams processSmp
 #'
 #' @export
 
-plotFit <- function(std, xvar, yvar, dilvar, fitpar = NULL, FUNmod = NULL,
-                    iout = NULL, bg = NULL, vsmp = NULL, smpflag = NULL,
-                    trimval = NULL, trimext = NULL,
+plotFit <- function(std, xvar, yvar, fitpar = NULL, FUNmod = NULL, iout = NULL,
+                    bg = NULL, vsmp = NULL, smpflag = NULL, trimval = NULL,
+                    trimext = NULL, tcklab = NULL,
                     stdcol = c("firebrick3", "darkslategray"),
                     rugcol = c("cadetblue", "purple", "firebrick2"), ...) {
   if (!hasArg(ylim)) {
@@ -46,13 +47,11 @@ plotFit <- function(std, xvar, yvar, dilvar, fitpar = NULL, FUNmod = NULL,
       rug(vsmp[grep("min|max",     smpflag)], side = 2, col = rugcol[3])
     }
   }
-
-  if (dilvar %in% colnames(std)) {
-    labs = parse(text = paste("frac(1, ", std[, dilvar], ")", sep = ""))
-  } else {
-    labs = round(std[, xvar], 3)
+  if (is.null(tcklab)) {
+    tcklab <- round(round(std[, xvar], 3))
   }
-  axis(side = 1, at = std[, xvar], cex.axis = 0.7, tcl = -0.1, labels = labs)
+
+  axis(side = 1, at = std[, xvar], cex.axis = 0.7, tcl = -0.1, labels = tcklab)
   abline(h = bg, lty = 3)
   if (!is.null(iout)) {
     points(std[iout, xvar], std[iout, yvar], col = 2, pch = 4, cex = 2)

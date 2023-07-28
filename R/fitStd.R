@@ -6,11 +6,10 @@
 #'
 #' @details to be added
 #'
-#' @param dilvar character string to check if there is a dilution variable in
-#'   \code{std}. If found, used for x-axis labels only.
 #' @param vsmp    sample values.
 #' @param info   information about a particular run for warning messages.
 #' @inheritParams processSmp
+#' @inheritParams plotFit
 #'
 #' @return A list containing parameters of the fit and bounds of the fit (named
 #'   vectors), as well as indices of removed points (if any) and flags r.
@@ -19,13 +18,12 @@
 #'
 #' @export
 
-fitStd <- function(std, xvar, yvar, dilvar = "Dilution",
-                   model = "sigmoid", Alow = NULL, asym = TRUE,
+fitStd <- function(std, xvar, yvar, model = "sigmoid", Alow = NULL, asym = TRUE,
                    interactive = TRUE, monot.prompt = FALSE,
                    rm.before = FALSE, rm.after = interactive, maxrm = 2,
                    set.bounds = FALSE, overwrite.bounds = FALSE, bg = NULL,
                    vsmp = NULL, optmethod = "Nelder-Mead", maxit = 5e3,
-                   info = "", ifix = NULL,
+                   info = "", ifix = NULL, tcklab = NULL,
                    stdcol = c("firebrick3", "darkslategray"),
                    rugcol = c("cadetblue", "purple", "firebrick2"), ...) {
   options(warn = 1)                        # for interactivity
@@ -48,9 +46,12 @@ fitStd <- function(std, xvar, yvar, dilvar = "Dilution",
     }
   }
 
+  if (is.null(tcklab)) {
+    tcklab <- round(round(std[, xvar], 3))
+  }
   if (rm.before) {
-    plotFit(std, xvar, yvar, dilvar, bg = bg, vsmp = vsmp,
-            stdcol = stdcol, rugcol = rugcol, ...)
+    plotFit(std, xvar, yvar, bg = bg, vsmp = vsmp,
+            tcklab = tcklab, stdcol = stdcol, rugcol = rugcol, ...)
     for (i in 1:maxrm) {
       wd <- ifelse(i == 1, "any", "more")
       ans1 <- readline(paste("Remove", wd, "outliers? (y/n) "))
@@ -124,13 +125,13 @@ fitStd <- function(std, xvar, yvar, dilvar = "Dilution",
     mindet <- max(min(std1[, yvar]), fitpar["Alow"])
     maxdet <- min(max(std1[, yvar]), fitpar["Aup"])
     smpflag[!(mindet <= vsmp & vsmp <= maxdet)] <- "min"
-    plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod,
-            iout = iout, bg = bg,
-            vsmp = vsmp, smpflag = smpflag, stdcol = stdcol, rugcol = rugcol,
-            ...)
+    plotFit(std, xvar, yvar, fitpar = fitpar, FUNmod = FUNmod, iout = iout,
+            bg = bg, vsmp = vsmp, smpflag = smpflag, tcklab = tcklab,
+            stdcol = stdcol, rugcol = rugcol, ...)
     #*** end INSERTED, uncomment plotFit() below
-    #    plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod, bg = bg,
-    #            vsmp = vsmp, stdcol = stdcol, rugcol = rugcol, ...)
+    #    plotFit(std, xvar, yvar, fitpar = fitpar, FUNmod = FUNmod, bg = bg,
+    #            vsmp = vsmp, tcklab = tcklab, stdcol = stdcol, rugcol = rugcol,
+    #            ...)
 
     for (i in 1:maxrm) {
       wd <- ifelse(i == 1, "any", "more")
@@ -168,12 +169,12 @@ fitStd <- function(std, xvar, yvar, dilvar = "Dilution",
         mindet <- max(min(std1[, yvar]), fitpar["Alow"])
         maxdet <- min(max(std1[, yvar]), fitpar["Aup"])
         smpflag[!(mindet <= vsmp & vsmp <= maxdet)] <- "min"
-        plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod,
-                iout = iout, bg = bg, vsmp = vsmp, smpflag = smpflag,
+        plotFit(std, xvar, yvar, fitpar = fitpar, FUNmod = FUNmod, iout = iout,
+                bg = bg, vsmp = vsmp, smpflag = smpflag, tcklab = tcklab,
                 stdcol = stdcol, rugcol = rugcol, ...)
         #*** end INSERTED, uncomment plotFit() below
-        #        plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod,
-        #                iout = iout, bg = bg, vsmp = vsmp,
+        #        plotFit(std, xvar, yvar, fitpar = fitpar, FUNmod = FUNmod,
+        #                iout = iout, bg = bg, vsmp = vsmp, tcklab = tcklab,
         #                stdcol = stdcol, rugcol = rugcol,...)
       } else {         # answer no
         if (i == 1) {  # answer no for the first time
@@ -232,12 +233,12 @@ fitStd <- function(std, xvar, yvar, dilvar = "Dilution",
           mindet <- max(min(std1[, yvar]), fitpar["Alow"])
           maxdet <- min(max(std1[, yvar]), fitpar["Aup"])
           smpflag[!(mindet <= vsmp & vsmp <= maxdet)] <- "min"
-          plotFit(std, xvar, yvar, dilvar, fitpar = fitpar, FUNmod = FUNmod,
+          plotFit(std, xvar, yvar, fitpar = fitpar, FUNmod = FUNmod,
                   iout = iout, bg = bg, vsmp = vsmp, smpflag = smpflag,
-                  stdcol = stdcol, rugcol = rugcol, ...)
+                  tcklab = tcklab, stdcol = stdcol, rugcol = rugcol, ...)
           #*** end INSERTED, uncomment plotFit() below
-          #          plotFit(std, xvar, yvar, dilvar, fitpar = fit$par, FUNmod = FUNmod,
-          #                  iout = iout, bg = bg, vsmp = vsmp,
+          #          plotFit(std, xvar, yvar, fitpar = fitpar, FUNmod = FUNmod,
+          #                  iout = iout, bg = bg, vsmp = vsmp, tcklab = tcklab,
           #                  stdcol = stdcol, rugcol = rugcol, ...)
           abline(h = bounds[c("lowerbound", "upperbound")], col = rugcol[2],
                  lty = 4)
@@ -248,8 +249,8 @@ fitStd <- function(std, xvar, yvar, dilvar = "Dilution",
       while (revise) {
         mtext("Indicate lower bound with a click", col = "red", cex = 1.2)
         bounds["lowerbound"] <- locator(n = 1)$y
-        plotFit(std, xvar, yvar, dilvar, fitpar = fit$par, FUNmod = FUNmod,
-                iout = iout, bg = bg, vsmp = vsmp,
+        plotFit(std, xvar, yvar, fitpar = fitpar, FUNmod = FUNmod,
+                iout = iout, bg = bg, vsmp = vsmp, tcklab = tcklab,
                 stdcol = stdcol, rugcol = rugcol, ...)
         abline(h = bounds[c("lowerbound", "upperbound")], col = rugcol[2],
                lty = 4)
@@ -268,8 +269,8 @@ fitStd <- function(std, xvar, yvar, dilvar = "Dilution",
         revise <- TRUE
         flag <- paste(flag, ", ub_manual", sep = "")
         if (!(rm.after || overlower || overwrite.bounds)) {  # no active plot
-          plotFit(std, xvar, yvar, dilvar, fitpar = fit$par, FUNmod = FUNmod,
-                  iout = iout, bg = bg, vsmp = vsmp,
+          plotFit(std, xvar, yvar, fitpar = fitpar, FUNmod = FUNmod,
+                  iout = iout, bg = bg, vsmp = vsmp, tcklab = tcklab,
                   stdcol = stdcol, rugcol = rugcol, ...)
           abline(h = bounds[c("lowerbound", "upperbound")], col = rugcol[2],
                  lty = 4)
@@ -280,8 +281,8 @@ fitStd <- function(std, xvar, yvar, dilvar = "Dilution",
       while (revise) {
         mtext("Indicate upper bound with a click", col = "red", cex = 1.2)
         bounds["upperbound"] <- locator(n = 1)$y
-        plotFit(std, xvar, yvar, dilvar, fitpar = fit$par, FUNmod = FUNmod,
-                iout = iout, bg = bg, vsmp = vsmp,
+        plotFit(std, xvar, yvar, fitpar = fitpar, FUNmod = FUNmod,
+                iout = iout, bg = bg, vsmp = vsmp, tcklab = tcklab,
                 stdcol = stdcol, rugcol = rugcol, ...)
         abline(h = bounds[c("lowerbound", "upperbound")], col = rugcol[2],
                lty = 4)

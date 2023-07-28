@@ -8,7 +8,6 @@ plotFit(
   std,
   xvar,
   yvar,
-  dilvar,
   fitpar = NULL,
   FUNmod = NULL,
   iout = NULL,
@@ -17,6 +16,7 @@ plotFit(
   smpflag = NULL,
   trimval = NULL,
   trimext = NULL,
+  tcklab = NULL,
   stdcol = c("firebrick3", "darkslategray"),
   rugcol = c("cadetblue", "purple", "firebrick2"),
   ...
@@ -28,9 +28,6 @@ plotFit(
 \item{xvar, yvar}{character strings for the variables used to fit a standard
 curve. If \code{NULL}, first two columns are assumed to be \code{x} and
 \code{y} variables.}
-
-\item{dilvar}{character string to check if there is a dilution variable in
-\code{std}. If found, used for x-axis labels only.}
 
 \item{fitpar}{values of function parameters.}
 
@@ -49,6 +46,8 @@ trimmed.}
 
 \item{trimext}{integer vector of length two indicating if the values are
 trimmed at the extremum (lower and upper).}
+
+\item{tcklab}{tick labels for x-axis.}
 
 \item{stdcol}{vector of two colors for the standard points and the fit on the
 plot.}

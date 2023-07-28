@@ -126,6 +126,7 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
   if (!(inherits(std, "matrix") || inherits(std, "data.frame"))) {
     std <- as.data.frame(std)
   }
+  std <- std[order(std[, xvar]), ]       # for iout; also sorted in fitStd()
   if (is.null(xvar) || is.null(yvar)) {  # first two columns assumed to be x, y
     colnames(std) <- c("x", "y")
     xvar <- "x"
@@ -149,9 +150,14 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
   }
   xlab <- xvar
   ylab <- yvar
+  if (dilvar %in% colnames(std)) {
+    tcklab = parse(text = paste("frac(1, ", std[, dilvar], ")", sep = ""))
+  } else {
+    tcklab = round(std[, xvar], 3)
+  }
   if (grepl("x", fitlog)) {
     std[, xvar] <- log(std[, xvar])
-    xlab <- paste("log", xvar)
+    xlab <- paste(xvar, "(log scale)")
   }
   if (grepl("y", fitlog)) {
     oldvar <- smpvar                     # reassign smpvar
@@ -161,12 +167,12 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
     if (!is.null(bg)) bg <- log(bg)
     ylab <- paste("log", yvar)
   }
-  std <- std[order(std[, xvar]), ]       # for iout; also sorted in fitStd()
 
-  finfit <- fitStd(std, xvar, yvar, dilvar, model, Alow, asym, interactive,
-                   monot.prompt, rm.before, rm.after, maxrm, set.bounds,
-                   overwrite.bounds, bg, smp[ismp, smpvar], optmethod, maxit,
-                   info = ptitle, ifix = ifix, stdcol = stdcol, rugcol = rugcol,
+  finfit <- fitStd(std, xvar, yvar, model, Alow, asym,
+                   interactive, monot.prompt, rm.before, rm.after, maxrm,
+                   set.bounds, overwrite.bounds, bg, smp[ismp, smpvar],
+                   optmethod, maxit, info = ptitle, ifix = ifix,
+                   tcklab = tcklab, stdcol = stdcol, rugcol = rugcol,
                    main = ptitle, xlab = xlab, ylab = ylab, ...)
   if (grepl("sig", model)) {
     FUNmod <- fsig
@@ -185,13 +191,14 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
   if (!is.null(finfit$par)) {
     trimval <- dfout[1, c("trim_lo", "trim_up")]
     trimext <- (trimval == dfout[1, c("min", "max")]) + 1  # at extrema
-    plotFit(std, xvar, yvar, dilvar, finfit$par, FUNmod, finfit$iout, bg,
+    plotFit(std, xvar, yvar, finfit$par, FUNmod, finfit$iout, bg,
             dfout[ismp, smpvar], dfout[ismp, "Flag"], trimval, trimext,
-            stdcol, rugcol, main = ptitle, xlab = xlab, ylab = ylab, ...)
-  } else {
-    plotFit(std, xvar, yvar, dilvar, iout = finfit$iout, bg = bg,
-            vsmp = dfout[ismp, smpvar], stdcol = stdcol, rugcol = rugcol,
+            tcklab, stdcol, rugcol,
             main = ptitle, xlab = xlab, ylab = ylab, ...)
+  } else {
+    plotFit(std, xvar, yvar, iout = finfit$iout, bg = bg,
+            vsmp = dfout[ismp, smpvar], tcklab = tcklab, stdcol = stdcol,
+            rugcol = rugcol, main = ptitle, xlab = xlab, ylab = ylab, ...)
   }
   dev.off()
   #  return(list(smp = dfout, fitflag = finfit$flag))  #*** if not below
