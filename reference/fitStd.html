@@ -52,7 +52,6 @@ fits, perform revisions, and record a message regarding the fit.</p>
 <span>  <span class="va">std</span>,</span>
 <span>  <span class="va">xvar</span>,</span>
 <span>  <span class="va">yvar</span>,</span>
-<span>  dilvar <span class="op">=</span> <span class="st">"Dilution"</span>,</span>
 <span>  model <span class="op">=</span> <span class="st">"sigmoid"</span>,</span>
 <span>  Alow <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  asym <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -69,6 +68,7 @@ fits, perform revisions, and record a message regarding the fit.</p>
 <span>  maxit <span class="op">=</span> <span class="fl">5000</span>,</span>
 <span>  info <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  ifix <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  tcklab <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  stdcol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"firebrick3"</span>, <span class="st">"darkslategray"</span><span class="op">)</span>,</span>
 <span>  rugcol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cadetblue"</span>, <span class="st">"purple"</span>, <span class="st">"firebrick2"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -85,11 +85,6 @@ fits, perform revisions, and record a message regarding the fit.</p>
 <dd><p>character strings for the variables used to fit a standard
 curve. If <code>NULL</code>, first two columns are assumed to be <code>x</code> and
 <code>y</code> variables.</p></dd>
-
-
-<dt>dilvar</dt>
-<dd><p>character string to check if there is a dilution variable in
-<code>std</code>. If found, used for x-axis labels only.</p></dd>
 
 
 <dt>model</dt>
@@ -174,6 +169,10 @@ automatically set bounds. Ignored if <code>interactive</code> is <code>FALSE</co
 <dt>ifix</dt>
 <dd><p>sorted integer vector of length 3 with indices of standards to be
 used for getting starting values for optimization.</p></dd>
+
+
+<dt>tcklab</dt>
+<dd><p>tick labels for x-axis.</p></dd>
 
 
 <dt>stdcol</dt>

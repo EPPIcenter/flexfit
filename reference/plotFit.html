@@ -52,7 +52,6 @@ for the background.</p>
 <span>  <span class="va">std</span>,</span>
 <span>  <span class="va">xvar</span>,</span>
 <span>  <span class="va">yvar</span>,</span>
-<span>  <span class="va">dilvar</span>,</span>
 <span>  fitpar <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  FUNmod <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  iout <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -61,6 +60,7 @@ for the background.</p>
 <span>  smpflag <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  trimval <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  trimext <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  tcklab <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  stdcol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"firebrick3"</span>, <span class="st">"darkslategray"</span><span class="op">)</span>,</span>
 <span>  rugcol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cadetblue"</span>, <span class="st">"purple"</span>, <span class="st">"firebrick2"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -77,11 +77,6 @@ for the background.</p>
 <dd><p>character strings for the variables used to fit a standard
 curve. If <code>NULL</code>, first two columns are assumed to be <code>x</code> and
 <code>y</code> variables.</p></dd>
-
-
-<dt>dilvar</dt>
-<dd><p>character string to check if there is a dilution variable in
-<code>std</code>. If found, used for x-axis labels only.</p></dd>
 
 
 <dt>fitpar</dt>
@@ -116,6 +111,10 @@ trimmed.</p></dd>
 <dt>trimext</dt>
 <dd><p>integer vector of length two indicating if the values are
 trimmed at the extremum (lower and upper).</p></dd>
+
+
+<dt>tcklab</dt>
+<dd><p>tick labels for x-axis.</p></dd>
 
 
 <dt>stdcol</dt>
