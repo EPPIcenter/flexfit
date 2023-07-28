@@ -59,21 +59,23 @@ plotFit <- function(std, xvar, yvar, dilvar, fitpar = NULL, FUNmod = NULL,
   }
   if (!is.null(trimval)) {
     abline(h = trimval, col = rugcol[2:3][trimext], lty = 6, lwd = 1.2)
-    legend("right", inset = 0.03, box.col = "white", bg = "white", cex = 0.9,
-           col = rugcol[3:2], lty = 6, lwd = 1.5, seg.len = 2.5,
+    legend("right", inset = 0.03, box.col = "white",
+           bg = adjustcolor("white", 0.6), cex = 0.9, col = rugcol[3:2],
+           lty = 6, lwd = 1.5, seg.len = 2.5,
            title = "trimmed at", legend = c("extrema", "bounds"))
   }
   if (is.null(fitpar)) {
     legend("bottom", inset = 0.03, box.col = "grey", box.lwd = 0.8,
-           bg = "white", cex = 0.9, col = c(stdcol[1], 1), lty = c(NA, 3),
-           lwd = c(1.5, 1), pch = c(1, NA), seg.len = 2.5,
+           bg = adjustcolor("white", 0.6), cex = 0.9, col = c(stdcol[1], 1),
+           lty = c(NA, 3), lwd = c(1.5, 1), pch = c(1, NA), seg.len = 2.5,
            legend = c("standards", "background"))
   } else {
     x <- seq(min(std[, xvar]), max(std[, xvar]), length = 200)
     y <- FUNmod(x, fitpar)
     lines(x, y, lty = 5, lwd = 1.8, col = stdcol[2])
     legend("bottom", inset = 0.05, box.col = "grey", box.lwd = 0.8,
-           bg = "white", cex = 0.9, col = c(stdcol[1], 1, stdcol[2]),
+           bg = adjustcolor("white", 0.6), cex = 0.9,
+           col = c(stdcol[1], 1, stdcol[2]),
            lty = c(NA, 3, 5), lwd = c(1.5, 1, 2), pch = c(1, NA, NA),
            seg.len = 2.5, legend = c("standards", "background", "fit"))
   }

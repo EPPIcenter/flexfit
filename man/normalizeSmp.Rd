@@ -14,7 +14,9 @@ normalizeSmp(
   bounds,
   fitflag,
   fitlog,
-  trim.flat = TRUE
+  trim.flat = TRUE,
+  extrapolate.low = FALSE,
+  extrapolate.up = FALSE
 )
 }
 \arguments{
@@ -22,9 +24,7 @@ normalizeSmp(
 
 \item{smpvar}{character string indicating sample variable.}
 
-\item{resvar}{character strings for dilution variable and results.}
-
-\item{dilvar}{character strings for dilution variable and results.}
+\item{dilvar, resvar}{character strings for dilution variable and results.}
 
 \item{FUNinv}{inverse function to infer sample concentration}
 
@@ -45,6 +45,14 @@ starts to flatten out (automatically determined as maxima of the third
 derivative of the function). If \code{FALSE}, \code{yvar} will be trimmed
 at extrema, defined as the range of standards or asymptotes of the fit
 (whichever are less extreme).}
+
+\item{extrapolate.low}{if \code{TRUE}, sample values beyond lower bounds will
+be processed by extrapolation of the standard curve (not recommended).
+Takes precedence over \code{trim.flat} value.}
+
+\item{extrapolate.up}{if \code{TRUE}, sample values beyond upper bounds will
+be processed by extrapolation of the standard curve (not recommended).
+Takes precedence over \code{trim.flat} value.}
 }
 \value{
 A data frame.
@@ -53,5 +61,5 @@ A data frame.
 Calculate sample concentration based on the fit of standard dilutions.
 }
 \details{
-
+coming up
 }

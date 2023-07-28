@@ -2,7 +2,7 @@
 #'
 #' Calculate sample concentration based on the fit of standard dilutions.
 #'
-#' @details
+#' @details coming up
 #'
 #' @param smp     data frame containing samples
 #' @param FUNinv  inverse function to infer sample concentration
@@ -17,7 +17,8 @@
 #' @export
 
 normalizeSmp <- function(smp, smpvar, resvar, dilvar, FUNinv, par, bounds,
-                         fitflag, fitlog, trim.flat = TRUE) {
+                         fitflag, fitlog, trim.flat = TRUE,
+                         extrapolate.low = FALSE, extrapolate.up = FALSE) {
   if (is.null(resvar)) {
     resvar <- "conc"
   }
@@ -43,7 +44,12 @@ normalizeSmp <- function(smp, smpvar, resvar, dilvar, FUNinv, par, bounds,
   smp$Flag[imin]  <- "below_min"                   # overwrites
   smp$Flag[imax]  <- "above_max"                   # overwrites
 
-  if (trim.flat && !is.na(bounds["lowerbound"]) &&
+  if (extrapolate.low) {
+    warning("Extrapolated results are not reliable; setting extrapolate.low = FALSE is recommended")
+    ilo <- smp[, smpvar] <= par["Alow"]
+    smp$Flag[ilo] <- "below_lower_asymptote"
+    smp$trim_lo <- par["Alow"]                     # 0 concentration
+  } else if (trim.flat && !is.na(bounds["lowerbound"]) &&
       bounds["lowerbound"] > bounds["mindet"]) {
     ilo <- ilobd
     smp$trim_lo <- bounds["lowerbound"]
@@ -51,7 +57,12 @@ normalizeSmp <- function(smp, smpvar, resvar, dilvar, FUNinv, par, bounds,
     ilo <- imin
     smp$trim_lo <- bounds["mindet"]
   }
-  if (trim.flat && !is.na(bounds["upperbound"]) &&
+  if (extrapolate.up) {
+    warning("Extrapolated results are not reliable; setting extrapolate.up = FALSE is highly recommended")
+    iup <- smp[, smpvar] >= par["Aup"]
+    smp$Flag[iup] <- "above_upper_asymptote"
+    smp$trim_up <- par["Aup"]                      # Inf concentration
+  } else if (trim.flat && !is.na(bounds["upperbound"]) &&
       bounds["upperbound"] < bounds["maxdet"]) {
     iup <- iupbd
     smp$trim_up <- bounds["upperbound"]

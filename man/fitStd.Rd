@@ -33,11 +33,7 @@ fitStd(
 \arguments{
 \item{std}{matrix or data frame with standards for fitting.}
 
-\item{xvar}{character strings for the variables used to fit a standard
-curve. If \code{NULL}, first two columns are assumed to be \code{x} and
-\code{y} variables.}
-
-\item{yvar}{character strings for the variables used to fit a standard
+\item{xvar, yvar}{character strings for the variables used to fit a standard
 curve. If \code{NULL}, first two columns are assumed to be \code{x} and
 \code{y} variables.}
 
@@ -116,7 +112,4 @@ fits, perform revisions, and record a message regarding the fit.
 }
 \details{
 to be added
-}
-\examples{
-
 }

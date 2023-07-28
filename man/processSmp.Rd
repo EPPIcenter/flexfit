@@ -19,7 +19,7 @@ processSmp(
   smpvar = NULL,
   addvar = NULL,
   dilvar = NULL,
-  resvar = NULL,
+  resvar = "concentration",
   model = "sigmoid",
   Alow = NULL,
   asym = TRUE,
@@ -32,6 +32,8 @@ processSmp(
   set.bounds = interactive,
   overwrite.bounds = FALSE,
   ifix = NULL,
+  extrapolate.low = FALSE,
+  extrapolate.up = FALSE,
   optmethod = "Nelder-Mead",
   maxit = 5000,
   stdcol = c("firebrick3", "darkslategray"),
@@ -127,6 +129,14 @@ automatically set bounds. Ignored if \code{interactive} is \code{FALSE}.}
 \item{ifix}{sorted integer vector of length 3 with indices of standards to be
 used for getting starting values for optimization.}
 
+\item{extrapolate.low}{if \code{TRUE}, sample values beyond lower bounds will
+be processed by extrapolation of the standard curve (not recommended).
+Takes precedence over \code{trim.flat} value.}
+
+\item{extrapolate.up}{if \code{TRUE}, sample values beyond upper bounds will
+be processed by extrapolation of the standard curve (not recommended).
+Takes precedence over \code{trim.flat} value.}
+
 \item{optmethod}{method to be used in optimization.}
 
 \item{maxit}{maximum number of iterations in optimization.}
@@ -159,7 +169,4 @@ Note that if \code{fitlog} contains _x_ and thus \code{xvar} in
   standards is log-transform before fitting, the results are still returned
   on a regular scale (values of inverse function are exponentiated and then
   multiplied by dilution).
-}
-\examples{
-
 }
