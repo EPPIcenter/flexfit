@@ -31,9 +31,9 @@ getStart4par <- function(x, y, ifix = NULL, nv = 10, info = "") {
   }
   imin <- which.min(ss)
   # check fit: SS (sum of squares) too large
-  if (ss[imin] >= (n - 3)*(mean(abs(diff(y)))/2)^2) {
-    return(NA)
-  }
+#  if (ss[imin] >= (n - 3)*(mean(abs(diff(y)))/2)^2) {  #*** uncomment later
+#    return(NA)
+#  }
   if (imin %in% c(1, nv - 1)) {
     vmin <- vval[imin]                                       # not a good fit
   } else {
