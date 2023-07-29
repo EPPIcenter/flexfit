@@ -48,7 +48,8 @@ plotFit <- function(std, xvar, yvar, fitpar = NULL, FUNmod = NULL, iout = NULL,
     }
   }
   if (is.null(tcklab)) {
-    tcklab <- round(round(std[, xvar], 3))
+#    tcklab <- round(std[, xvar], 3)  #*** low conc shown as 0's
+    tcklab <- std[, xvar]
   }
 
   axis(side = 1, at = std[, xvar], cex.axis = 0.7, tcl = -0.1, labels = tcklab)

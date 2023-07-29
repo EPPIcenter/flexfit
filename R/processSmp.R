@@ -151,9 +151,10 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
   xlab <- xvar
   ylab <- yvar
   if (dilvar %in% colnames(std)) {
-    tcklab = parse(text = paste("frac(1, ", std[, dilvar], ")", sep = ""))
+    tcklab <- parse(text = paste("frac(1, ", std[, dilvar], ")", sep = ""))
   } else {
-    tcklab = round(std[, xvar], 3)
+#    tcklab <- round(std[, xvar], 3)  #*** low conc shown as 0's
+    tcklab <- std[, xvar]
   }
   if (grepl("x", fitlog)) {
     std[, xvar] <- log(std[, xvar])

@@ -47,7 +47,8 @@ fitStd <- function(std, xvar, yvar, model = "sigmoid", Alow = NULL, asym = TRUE,
   }
 
   if (is.null(tcklab)) {
-    tcklab <- round(round(std[, xvar], 3))
+#    tcklab <- round(std[, xvar], 3)  #*** low conc shown as 0's
+    tcklab <- std[, xvar]
   }
   if (rm.before) {
     plotFit(std, xvar, yvar, bg = bg, vsmp = vsmp,
