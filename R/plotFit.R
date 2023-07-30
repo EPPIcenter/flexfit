@@ -92,7 +92,11 @@ plotFit <- function(std, xvar, yvar, fitpar = NULL,
     col0    <- adjustcolor(stdcol[1], 0.7)
     x <- seq(xlim[1], xlim[2], length = npoints)
     y <- FUNmod(x, fitpar)
-    ymid <- range(std[-iout, yvar])
+    if (!is.null(iout)) {
+      ymid <- range(std[-iout, yvar])
+    } else {
+      ymid <- range(std[, yvar])
+    }
     ilow <- y <= ymid[1]
     iup  <- y >= ymid[2]
     imid <- !(ilow | iup)
