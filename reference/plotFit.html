@@ -54,12 +54,16 @@ for the background.</p>
 <span>  <span class="va">yvar</span>,</span>
 <span>  fitpar <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  FUNmod <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  FUNinv <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  iout <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  bg <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  vsmp <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  smpflag <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  trimval <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  trimext <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  extrapolate.low <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  extrapolate.up <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  tcklab <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  stdcol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"firebrick3"</span>, <span class="st">"darkslategray"</span><span class="op">)</span>,</span>
 <span>  rugcol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cadetblue"</span>, <span class="st">"purple"</span>, <span class="st">"firebrick2"</span><span class="op">)</span>,</span>
@@ -87,6 +91,10 @@ curve. If <code>NULL</code>, first two columns are assumed to be <code>x</code> 
 <dd><p>model function.</p></dd>
 
 
+<dt>FUNinv</dt>
+<dd><p>model inverse function.</p></dd>
+
+
 <dt>iout</dt>
 <dd><p>indices of removed standard points.</p></dd>
 
@@ -111,6 +119,22 @@ trimmed.</p></dd>
 <dt>trimext</dt>
 <dd><p>integer vector of length two indicating if the values are
 trimmed at the extremum (lower and upper).</p></dd>
+
+
+<dt>extrapolate.low</dt>
+<dd><p>if <code>TRUE</code>, sample values beyond lower bounds will
+be processed by extrapolation of the standard curve (not recommended).
+Takes precedence over <code>trim.flat</code> value.</p></dd>
+
+
+<dt>extrapolate.up</dt>
+<dd><p>if <code>TRUE</code>, sample values beyond upper bounds will
+be processed by extrapolation of the standard curve (not recommended).
+Takes precedence over <code>trim.flat</code> value.</p></dd>
+
+
+<dt>ylim</dt>
+<dd><p>limits of the y-axis.</p></dd>
 
 
 <dt>tcklab</dt>
