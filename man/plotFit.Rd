@@ -10,12 +10,16 @@ plotFit(
   yvar,
   fitpar = NULL,
   FUNmod = NULL,
+  FUNinv = NULL,
   iout = NULL,
   bg = NULL,
   vsmp = NULL,
   smpflag = NULL,
   trimval = NULL,
   trimext = NULL,
+  extrapolate.low = FALSE,
+  extrapolate.up = FALSE,
+  ylim = NULL,
   tcklab = NULL,
   stdcol = c("firebrick3", "darkslategray"),
   rugcol = c("cadetblue", "purple", "firebrick2"),
@@ -33,6 +37,8 @@ curve. If \code{NULL}, first two columns are assumed to be \code{x} and
 
 \item{FUNmod}{model function.}
 
+\item{FUNinv}{model inverse function.}
+
 \item{iout}{indices of removed standard points.}
 
 \item{bg}{background values.}
@@ -46,6 +52,16 @@ trimmed.}
 
 \item{trimext}{integer vector of length two indicating if the values are
 trimmed at the extremum (lower and upper).}
+
+\item{extrapolate.low}{if \code{TRUE}, sample values beyond lower bounds will
+be processed by extrapolation of the standard curve (not recommended).
+Takes precedence over \code{trim.flat} value.}
+
+\item{extrapolate.up}{if \code{TRUE}, sample values beyond upper bounds will
+be processed by extrapolation of the standard curve (not recommended).
+Takes precedence over \code{trim.flat} value.}
+
+\item{ylim}{limits of the y-axis.}
 
 \item{tcklab}{tick labels for x-axis.}
 

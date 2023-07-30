@@ -172,7 +172,10 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
   finfit <- fitStd(std, xvar, yvar, model, Alow, asym,
                    interactive, monot.prompt, rm.before, rm.after, maxrm,
                    set.bounds, overwrite.bounds, bg, smp[ismp, smpvar],
-                   optmethod, maxit, info = ptitle, ifix = ifix,
+                   optmethod, maxit,
+                   extrapolate.low = extrapolate.low,
+                   extrapolate.up  = extrapolate.up,
+                   info = ptitle, ifix = ifix,
                    tcklab = tcklab, stdcol = stdcol, rugcol = rugcol,
                    main = ptitle, xlab = xlab, ylab = ylab, ...)
   if (grepl("sig", model)) {
@@ -192,13 +195,18 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
   if (!is.null(finfit$par)) {
     trimval <- dfout[1, c("trim_lo", "trim_up")]
     trimext <- (trimval == dfout[1, c("min", "max")]) + 1  # at extrema
-    plotFit(std, xvar, yvar, finfit$par, FUNmod, finfit$iout, bg,
+    plotFit(std, xvar, yvar, finfit$par, FUNmod, FUNinv, finfit$iout, bg,
             dfout[ismp, smpvar], dfout[ismp, "Flag"], trimval, trimext,
-            tcklab, stdcol, rugcol,
+            extrapolate.low = extrapolate.low,
+            extrapolate.up  = extrapolate.up,
+            tcklab = tcklab, stdcol = stdcol, rugcol = rugcol,
             main = ptitle, xlab = xlab, ylab = ylab, ...)
   } else {
     plotFit(std, xvar, yvar, iout = finfit$iout, bg = bg,
-            vsmp = dfout[ismp, smpvar], tcklab = tcklab, stdcol = stdcol,
+            vsmp = dfout[ismp, smpvar],
+            extrapolate.low = extrapolate.low,
+            extrapolate.up  = extrapolate.up,
+            tcklab = tcklab, stdcol = stdcol,
             rugcol = rugcol, main = ptitle, xlab = xlab, ylab = ylab, ...)
   }
   dev.off()

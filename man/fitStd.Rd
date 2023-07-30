@@ -22,6 +22,8 @@ fitStd(
   vsmp = NULL,
   optmethod = "Nelder-Mead",
   maxit = 5000,
+  extrapolate.low = FALSE,
+  extrapolate.up = FALSE,
   info = "",
   ifix = NULL,
   tcklab = NULL,
@@ -83,6 +85,14 @@ automatically set bounds. Ignored if \code{interactive} is \code{FALSE}.}
 \item{optmethod}{method to be used in optimization.}
 
 \item{maxit}{maximum number of iterations in optimization.}
+
+\item{extrapolate.low}{if \code{TRUE}, sample values beyond lower bounds will
+be processed by extrapolation of the standard curve (not recommended).
+Takes precedence over \code{trim.flat} value.}
+
+\item{extrapolate.up}{if \code{TRUE}, sample values beyond upper bounds will
+be processed by extrapolation of the standard curve (not recommended).
+Takes precedence over \code{trim.flat} value.}
 
 \item{info}{information about a particular run for warning messages.}
 

@@ -23,6 +23,7 @@ fitStd <- function(std, xvar, yvar, model = "sigmoid", Alow = NULL, asym = TRUE,
                    rm.before = FALSE, rm.after = interactive, maxrm = 2,
                    set.bounds = FALSE, overwrite.bounds = FALSE, bg = NULL,
                    vsmp = NULL, optmethod = "Nelder-Mead", maxit = 5e3,
+                   extrapolate.low = FALSE, extrapolate.up = FALSE,
                    info = "", ifix = NULL, tcklab = NULL,
                    stdcol = c("firebrick3", "darkslategray"),
                    rugcol = c("cadetblue", "purple", "firebrick2"), ...) {
@@ -73,6 +74,7 @@ fitStd <- function(std, xvar, yvar, model = "sigmoid", Alow = NULL, asym = TRUE,
   if (!is.null(iout)) std1 <- std[-iout, ]
   if (grepl("sig", model)) {
     FUNmod <- fsig
+    FUNinv <- fsigInv
     if (!is.null(Alow)) {  # lower asymptote fixed
       startval <- getStart3par(std1[, xvar], std1[, yvar], Alow, ifix = ifix)
       if (is.na(startval[1])) {
@@ -92,6 +94,7 @@ fitStd <- function(std, xvar, yvar, model = "sigmoid", Alow = NULL, asym = TRUE,
     }
   } else {  # model 5 (6 parameters) *** update when available
     FUNmod <- flin
+    FUNinv <- flinInv
   }  # model 5 (6 parameters)
 
   if (is.na(startval[1])) {
@@ -126,13 +129,16 @@ fitStd <- function(std, xvar, yvar, model = "sigmoid", Alow = NULL, asym = TRUE,
     mindet <- max(min(std1[, yvar]), fitpar["Alow"])
     maxdet <- min(max(std1[, yvar]), fitpar["Aup"])
     smpflag[!(mindet <= vsmp & vsmp <= maxdet)] <- "min"
-    plotFit(std, xvar, yvar, fitpar = fitpar, FUNmod = FUNmod, iout = iout,
-            bg = bg, vsmp = vsmp, smpflag = smpflag, tcklab = tcklab,
-            stdcol = stdcol, rugcol = rugcol, ...)
+    plotFit(std, xvar, yvar, fitpar = fitpar, FUNmod = FUNmod, FUNinv = FUNinv,
+            iout = iout, bg = bg, vsmp = vsmp, smpflag = smpflag,
+            extrapolate.low = extrapolate.low, extrapolate.up  = extrapolate.up,
+            tcklab = tcklab, stdcol = stdcol, rugcol = rugcol, ...)
     #*** end INSERTED, uncomment plotFit() below
-    #    plotFit(std, xvar, yvar, fitpar = fitpar, FUNmod = FUNmod, bg = bg,
-    #            vsmp = vsmp, tcklab = tcklab, stdcol = stdcol, rugcol = rugcol,
-    #            ...)
+    #    plotFit(std, xvar, yvar, fitpar = fitpar, FUNmod = FUNmod,
+    #            FUNinv = FUNinv, bg = bg, vsmp = vsmp,
+    #            extrapolate.low = extrapolate.low,
+    #            extrapolate.up  = extrapolate.up, tcklab = tcklab,
+    #            stdcol = stdcol, rugcol = rugcol, ...)
 
     for (i in 1:maxrm) {
       wd <- ifelse(i == 1, "any", "more")
@@ -170,13 +176,17 @@ fitStd <- function(std, xvar, yvar, model = "sigmoid", Alow = NULL, asym = TRUE,
         mindet <- max(min(std1[, yvar]), fitpar["Alow"])
         maxdet <- min(max(std1[, yvar]), fitpar["Aup"])
         smpflag[!(mindet <= vsmp & vsmp <= maxdet)] <- "min"
-        plotFit(std, xvar, yvar, fitpar = fitpar, FUNmod = FUNmod, iout = iout,
-                bg = bg, vsmp = vsmp, smpflag = smpflag, tcklab = tcklab,
+        plotFit(std, xvar, yvar, fitpar = fitpar, FUNmod = FUNmod,
+                FUNinv = FUNinv, iout = iout, bg = bg, vsmp = vsmp,
+                smpflag = smpflag, extrapolate.low = extrapolate.low,
+                extrapolate.up  = extrapolate.up, tcklab = tcklab,
                 stdcol = stdcol, rugcol = rugcol, ...)
         #*** end INSERTED, uncomment plotFit() below
         #        plotFit(std, xvar, yvar, fitpar = fitpar, FUNmod = FUNmod,
-        #                iout = iout, bg = bg, vsmp = vsmp, tcklab = tcklab,
-        #                stdcol = stdcol, rugcol = rugcol,...)
+        #                FUNinv = FUNinv, iout = iout, bg = bg, vsmp = vsmp,
+        #                extrapolate.low = extrapolate.low,
+        #                extrapolate.up  = extrapolate.up,
+        #                tcklab = tcklab, stdcol = stdcol, rugcol = rugcol,...)
       } else {         # answer no
         if (i == 1) {  # answer no for the first time
           revise <- FALSE
@@ -235,11 +245,15 @@ fitStd <- function(std, xvar, yvar, model = "sigmoid", Alow = NULL, asym = TRUE,
           maxdet <- min(max(std1[, yvar]), fitpar["Aup"])
           smpflag[!(mindet <= vsmp & vsmp <= maxdet)] <- "min"
           plotFit(std, xvar, yvar, fitpar = fitpar, FUNmod = FUNmod,
-                  iout = iout, bg = bg, vsmp = vsmp, smpflag = smpflag,
+                  FUNinv = FUNinv, iout = iout, bg = bg, vsmp = vsmp,
+                  smpflag = smpflag, extrapolate.low = extrapolate.low,
+                  extrapolate.up  = extrapolate.up,
                   tcklab = tcklab, stdcol = stdcol, rugcol = rugcol, ...)
           #*** end INSERTED, uncomment plotFit() below
           #          plotFit(std, xvar, yvar, fitpar = fitpar, FUNmod = FUNmod,
-          #                  iout = iout, bg = bg, vsmp = vsmp, tcklab = tcklab,
+          #                  FUNinv = FUNinv, iout = iout, bg = bg, vsmp = vsmp,
+          #                  extrapolate.low = extrapolate.low,
+          #                  extrapolate.up  = extrapolate.up, tcklab = tcklab,
           #                  stdcol = stdcol, rugcol = rugcol, ...)
           abline(h = bounds[c("lowerbound", "upperbound")], col = rugcol[2],
                  lty = 4)
@@ -271,8 +285,10 @@ fitStd <- function(std, xvar, yvar, model = "sigmoid", Alow = NULL, asym = TRUE,
         flag <- paste(flag, ", ub_manual", sep = "")
         if (!(rm.after || overlower || overwrite.bounds)) {  # no active plot
           plotFit(std, xvar, yvar, fitpar = fitpar, FUNmod = FUNmod,
-                  iout = iout, bg = bg, vsmp = vsmp, tcklab = tcklab,
-                  stdcol = stdcol, rugcol = rugcol, ...)
+                  FUNinv = FUNinv, iout = iout, bg = bg, vsmp = vsmp,
+                  extrapolate.low = extrapolate.low,
+                  extrapolate.up  = extrapolate.up,
+                  tcklab = tcklab, stdcol = stdcol, rugcol = rugcol, ...)
           abline(h = bounds[c("lowerbound", "upperbound")], col = rugcol[2],
                  lty = 4)
           legend("right", bty = "n", cex = 0.9, col = rugcol[2], lty = 4,
@@ -283,8 +299,10 @@ fitStd <- function(std, xvar, yvar, model = "sigmoid", Alow = NULL, asym = TRUE,
         mtext("Indicate upper bound with a click", col = "red", cex = 1.2)
         bounds["upperbound"] <- locator(n = 1)$y
         plotFit(std, xvar, yvar, fitpar = fitpar, FUNmod = FUNmod,
-                iout = iout, bg = bg, vsmp = vsmp, tcklab = tcklab,
-                stdcol = stdcol, rugcol = rugcol, ...)
+                FUNinv = FUNinv, iout = iout, bg = bg, vsmp = vsmp,
+                extrapolate.low = extrapolate.low,
+                extrapolate.up  = extrapolate.up,
+                tcklab = tcklab, stdcol = stdcol, rugcol = rugcol, ...)
         abline(h = bounds[c("lowerbound", "upperbound")], col = rugcol[2],
                lty = 4)
         legend("right", bty = "n", cex = 0.9, col = rugcol[3:2], lty = 4,
