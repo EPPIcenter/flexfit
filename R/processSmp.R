@@ -143,10 +143,9 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
   }
   if (is.null(dilvar)) {                 # can be removed after processing if 1
     dilvar <- "Dilution"
-    smp[, dilvar] <- smpdil
   }
-  if (is.null(pname)) {                  # plot title used for pdf name
-    pname <- gsub("[[:space:]]", "_", ptitle)
+  if (!dilvar %in% colnames(smp)) {
+    smp[, dilvar] <- smpdil
   }
   xlab <- xvar
   ylab <- yvar
@@ -167,6 +166,9 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
     smp[, smpvar] <- log(smp[, oldvar])
     if (!is.null(bg)) bg <- log(bg)
     ylab <- paste("log", yvar)
+  }
+  if (is.null(pname)) {                  # plot title used for pdf name
+    pname <- gsub("[[:space:]]", "_", ptitle)
   }
 
   finfit <- fitStd(std, xvar, yvar, model, Alow, asym,
