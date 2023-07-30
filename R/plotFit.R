@@ -47,14 +47,14 @@ plotFit <- function(std, xvar, yvar, fitpar = NULL,
       ylow    <- min(vsmp[vsmp > fitpar["Alow"]])
       xlim[1] <- min(FUNinv(ylow, fitpar), xlim[1])
       if (!is.finite(xlim[1])) {
-        xlim[1] <- min(std[, xvar])
+        xlim[1] <- min(std[, xvar]) - diff(range(std[, xvar]))/(nrow(std) - 1)
       }
     }
     if (extrapolate.up) {
       yup     <- max(vsmp[vsmp < fitpar["Aup"]])
       xlim[2] <- max(FUNinv(yup, fitpar), xlim[2])
       if (!is.finite(xlim[2])) {
-        xlim[2] <- max(std[, xvar])
+        xlim[2] <- max(std[, xvar]) + diff(range(std[, xvar]))/(nrow(std) - 1)
       }
     }
   }
