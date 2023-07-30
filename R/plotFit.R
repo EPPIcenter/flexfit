@@ -88,12 +88,17 @@ plotFit <- function(std, xvar, yvar, fitpar = NULL,
            lty = c(NA, 3), lwd = c(1.5, 1), pch = c(1, NA), seg.len = 2.5,
            legend = c("standards", "background"))
   } else {
-    x <- seq(xlim[1], xlim[2], length = 200)
+    npoints <- 200
+    col0    <- adjustcolor(stdcol[1], 0.7)
+    x <- seq(xlim[1], xlim[2], length = npoints)
     y <- FUNmod(x, fitpar)
-    yextrap <- range(std[-iout, yvar])
-    iextrap <- y <= yextrap[1] | y >= yextrap[2]          # outside std range
-    cols <- c(adjustcolor(stdcol[1], 0.7), stdcol[2])[iextrap + 1]
-    lines(x, y, lty = 5, lwd = 1.8, col = cols)
+    ymid <- range(std[-iout, yvar])
+    ilow <- y <= ymid[1]
+    iup  <- y >= ymid[2]
+    imid <- !(ilow | iup)
+    lines(x[ilow], y[ilow], lty = 5, lwd = 1.8, col = col0)
+    lines(x[imid], y[imid], lty = 5, lwd = 1.8, col = stdcol[2])
+    lines(x[iup ], y[iup ], lty = 5, lwd = 1.8, col = col0)
     legend("bottom", inset = 0.05, box.col = "grey", box.lwd = 0.8,
            bg = adjustcolor("white", 0.6), cex = 0.9,
            col = c(stdcol[1], 1, stdcol[2]),
