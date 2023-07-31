@@ -153,7 +153,8 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
     tcklab <- parse(text = paste("frac(1, ", std[, dilvar], ")", sep = ""))
   } else {
 #    tcklab <- round(std[, xvar], 3)  #*** low conc shown as 0's
-    tcklab <- std[, xvar]
+#    tcklab <- std[, xvar]
+    tcklab <- sprintf("%.3e", std[, xvar])
   }
   if (grepl("x", fitlog)) {
     std[, xvar] <- log(std[, xvar])
