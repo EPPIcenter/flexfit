@@ -33,6 +33,12 @@ locatePt <- function(ptx, pty, datx, daty) {
 #*** ylim: only in plotFit(); not a parameter in processSmp() and fitStd()
 #          don't want to remove since might clash if ylim is passed as ...
 
+#*** !!! issue: if extrapolate and trim.flat, still says (incorrectly)
+#               "trimmed at bounds" + purple line at Alow
+#               in practice almost never a problem (low and not seen)
+#               in processSmp() - no option for "trimmed at asympt"
+#               *** check with team (preferences); can add extra color + legend
+
 plotFit <- function(std, xvar, yvar, fitpar = NULL,
                     FUNmod = NULL, FUNinv = NULL, iout = NULL,
                     bg = NULL, vsmp = NULL, smpflag = NULL, trimval = NULL,
@@ -44,14 +50,14 @@ plotFit <- function(std, xvar, yvar, fitpar = NULL,
   xlim <- range(std[, xvar])
   if (!is.null(fitpar)) {
     if (extrapolate.low) {
-      ylow    <- min(vsmp[vsmp > fitpar["Alow"]])
+      ylow    <- min(vsmp[vsmp > fitpar["Alow"]], na.rm = TRUE)
       xlim[1] <- min(FUNinv(ylow, fitpar), xlim[1])
       if (!is.finite(xlim[1])) {
         xlim[1] <- min(std[, xvar]) - diff(range(std[, xvar]))/(nrow(std) - 1)
       }
     }
     if (extrapolate.up) {
-      yup     <- max(vsmp[vsmp < fitpar["Aup"]])
+      yup     <- max(vsmp[vsmp < fitpar["Aup"]], na.rm = TRUE)
       xlim[2] <- max(FUNinv(yup, fitpar), xlim[2])
       if (!is.finite(xlim[2])) {
         xlim[2] <- max(std[, xvar]) + diff(range(std[, xvar]))/(nrow(std) - 1)
