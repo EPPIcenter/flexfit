@@ -45,7 +45,9 @@ normalizeSmp <- function(smp, smpvar, resvar, dilvar, FUNinv, par, bounds,
   smp$Flag[imax]  <- "above_max"                   # overwrites
 
   if (extrapolate.low) {
+    options(warn = 1)
     warning("Extrapolated results are not reliable; setting extrapolate.low = FALSE is recommended")
+    options(warn = 0)
     ilo <- smp[, smpvar] <= par["Alow"]
     smp$Flag[ilo] <- "below_lower_asymptote"
     smp$trim_lo <- par["Alow"]                     # 0 concentration
@@ -58,7 +60,9 @@ normalizeSmp <- function(smp, smpvar, resvar, dilvar, FUNinv, par, bounds,
     smp$trim_lo <- bounds["mindet"]
   }
   if (extrapolate.up) {
+    options(warn = 1)
     warning("Extrapolated results are not reliable; setting extrapolate.up = FALSE is highly recommended")
+    options(warn = 0)
     iup <- smp[, smpvar] >= par["Aup"]
     smp$Flag[iup] <- "above_upper_asymptote"
     smp$trim_up <- par["Aup"]                      # Inf concentration
@@ -70,6 +74,7 @@ normalizeSmp <- function(smp, smpvar, resvar, dilvar, FUNinv, par, bounds,
     iup <- imax
     smp$trim_up <- bounds["maxdet"]
   }
+  options(warn = 1)
   imid <- which(!(ilo | iup))  # get rid of NA's
   ilo  <- which(ilo)
   iup  <- which(iup)
