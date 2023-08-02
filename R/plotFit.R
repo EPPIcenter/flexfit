@@ -73,8 +73,9 @@ plotFit <- function(std, xvar, yvar, fitpar = NULL,
   if(!is.null(vsmp)) {
     rug(vsmp, side = 2, col = rugcol[1])
     if (!is.null(smpflag)) {
-      rug(vsmp[grep("lower|upper", smpflag)], side = 2, col = rugcol[2])
-      rug(vsmp[grep("min|max",     smpflag)], side = 2, col = rugcol[3])
+      #*** fix so not purple below asymptote
+      rug(vsmp[grep("lower|upper",       smpflag)], side = 2, col = rugcol[2])
+      rug(vsmp[grep("min|max|asymptote", smpflag)], side = 2, col = rugcol[3])
     }
   }
   if (is.null(tcklab)) {
