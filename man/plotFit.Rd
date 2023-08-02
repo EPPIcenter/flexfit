@@ -16,7 +16,7 @@ plotFit(
   vsmp = NULL,
   smpflag = NULL,
   trimval = NULL,
-  trimext = NULL,
+  trimtype = NULL,
   extrapolate.low = FALSE,
   extrapolate.up = FALSE,
   ylim = NULL,
@@ -50,7 +50,7 @@ curve. If \code{NULL}, first two columns are assumed to be \code{x} and
 \item{trimval}{for final results, the values at which the samples are
 trimmed.}
 
-\item{trimext}{integer vector of length two indicating if the values are
+\item{trimtype}{integer vector of length two indicating if the values are
 trimmed at the extremum (lower and upper).}
 
 \item{extrapolate.low}{if \code{TRUE}, sample values beyond lower bounds will

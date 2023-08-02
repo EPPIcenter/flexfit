@@ -21,7 +21,7 @@ locatePt <- function(ptx, pty, datx, daty) {
 #' @param smpflag character vector, flags for each sample.
 #' @param trimval for final results, the values at which the samples are
 #'   trimmed.
-#' @param trimext integer vector of length two indicating if the values are
+#' @param trimtype integer vector of length two indicating if the values are
 #'   trimmed at the extremum (lower and upper).
 #' @param ylim    limits of the y-axis.
 #' @param tcklab  tick labels for x-axis.
@@ -42,7 +42,7 @@ locatePt <- function(ptx, pty, datx, daty) {
 plotFit <- function(std, xvar, yvar, fitpar = NULL,
                     FUNmod = NULL, FUNinv = NULL, iout = NULL,
                     bg = NULL, vsmp = NULL, smpflag = NULL, trimval = NULL,
-                    trimext = NULL,
+                    trimtype = NULL,
                     extrapolate.low = FALSE, extrapolate.up = FALSE,
                     ylim = NULL, tcklab = NULL,
                     stdcol = c("firebrick3", "darkslategray"),
@@ -89,9 +89,8 @@ plotFit <- function(std, xvar, yvar, fitpar = NULL,
     points(std[iout, xvar], std[iout, yvar], col = 2, pch = 4, cex = 2)
   }
   if (!is.null(trimval)) {
-    abline(h = trimval, col = rugcol[2:3][trimext], lty = 6, lwd = 1.2)
-    legend("right", inset = 0.03, box.col = "white",
-           bg = adjustcolor("white", 0.6), cex = 0.9, col = rugcol[3:2],
+    abline(h = trimval, col = c(rugcol[2:3], 1)[trimtype], lty = 6, lwd = 1.2)
+    legend("right", inset = 0.03, bty = "n", cex = 0.9, col = rugcol[3:2],
            lty = 6, lwd = 1.5, seg.len = 2.5,
            title = "trimmed at", legend = c("extrema", "bounds"))
   }

@@ -197,9 +197,13 @@ processSmp <- function(smp, std, bg = NULL, smpdil = 1, fitlog = "xy",
   pdf(file = fplot, width = width, height = height)
   if (!is.null(finfit$par)) {
     trimval <- dfout[1, c("trim_lo", "trim_up")]
-    trimext <- (trimval == dfout[1, c("min", "max")]) + 1  # at extrema
+#    trimext <- (trimval == dfout[1, c("min", "max")]) + 1 # at extrema (min/max)
+    a <- trimval == dfout[1, paste0(c("lower", "upper"), "_bound")]
+    b <- trimval == dfout[1, c("min", "max")]
+    # 1: bounds, 2: min/max, 3: asymptote
+    trimtype <- (!a & !b) + 2 - a
     plotFit(std, xvar, yvar, finfit$par, FUNmod, FUNinv, finfit$iout, bg,
-            dfout[ismp, smpvar], dfout[ismp, "Flag"], trimval, trimext,
+            dfout[ismp, smpvar], dfout[ismp, "Flag"], trimval, trimtype,
             extrapolate.low = extrapolate.low,
             extrapolate.up  = extrapolate.up,
             tcklab = tcklab, stdcol = stdcol, rugcol = rugcol,
